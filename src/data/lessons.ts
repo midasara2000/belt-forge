@@ -371,9 +371,15 @@ export const LESSONS: Lesson[] = [
       'Capacity Analysis',
       'Process Efficiency',
       'Process Flow Analysis',
+      'takt',
+      'throughput',
+      'bottleneck',
+      'wip',
+      'lead-time',
+      'process-efficiency',
     ],
     summary:
-      'See waste and flow: spaghetti for motion, VSM for lead time & inventory, value/time analysis for VA vs NVA, CFD for WIP buildup.',
+      'See waste and flow: spaghetti for motion, VSM for lead time & inventory, takt vs cycle time, throughput/WIP, value/time analysis, CFD for WIP buildup.',
     visual: 'vsm',
     visualCaption: 'VSM shows process boxes, inventory triangles, and information loops driving lead time.',
     sections: [
@@ -386,14 +392,14 @@ export const LESSONS: Lesson[] = [
         body: 'Material + information flow with timing. Inventory between steps often dominates lead time.',
       },
       {
-        heading: 'Efficiency lens',
-        body: 'Process cycle efficiency ≈ value-add time / lead time. Low PCE is a powerful sponsor story.',
+        heading: 'Takt, throughput & efficiency',
+        body: 'Takt = available production time / customer demand (the drumbeat). Compare cycle time at each step to takt to find overload. Throughput is output rate; WIP and lead time move together (Little’s Law: lead time ≈ WIP / throughput). Process cycle efficiency ≈ value-add time / lead time.',
       },
     ],
     takeaways: [
       'Match tool to symptom (motion → spaghetti; lead time → VSM).',
-      'Inventory triangles are waiting waste.',
-      'CFD shines in transactional queues.',
+      'CT > takt at a step ⇒ that step cannot keep the drumbeat.',
+      'Inventory triangles are waiting waste; elevating the constraint raises system throughput.',
     ],
   },
   {
@@ -495,9 +501,10 @@ export const LESSONS: Lesson[] = [
       'Generic/Replenishment/Two Bin Pull',
       'Batch Size',
       'Process Flow/Logic',
+      'bottleneck',
     ],
     summary:
-      'Improve often applies Lean patterns to verified causes: 5S, poka-yoke, layout, TOC, SMED, TPM, and pull systems sized to demand.',
+      'Improve often applies Lean patterns to verified causes: 5S, poka-yoke, layout, TOC (elevate the constraint), SMED, TPM, and pull systems sized to demand.',
     visual: 'pull',
     visualCaption: 'Pull: downstream demand triggers upstream replenishment — limiting overproduction.',
     sections: [
@@ -507,7 +514,7 @@ export const LESSONS: Lesson[] = [
       },
       {
         heading: 'Flow & constraints',
-        body: 'TOC elevates the bottleneck. SMED converts internal setup to external to enable smaller batches.',
+        body: 'TOC: identify the system bottleneck, exploit it, subordinate everything else, elevate it, then repeat. Local efficiency upstream of a constraint often just grows WIP. SMED converts internal setup to external to enable smaller batches.',
       },
       {
         heading: 'Pull variants',
@@ -516,7 +523,7 @@ export const LESSONS: Lesson[] = [
     ],
     takeaways: [
       'Solutions must attack verified X’s.',
-      'Two-bin fits steady consumables.',
+      'Never starve the constraint; don’t flood it with unneeded WIP either.',
       'Shorter setups → smaller batches → better flow.',
     ],
   },
