@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { normals, round } from '../rng';
 import type { SimKind } from '../types';
-import { Histogram, Scatter } from './Charts';
+import { Histogram, RunChart, Scatter } from './Charts';
 
 function phi(z: number): number {
   // Abramowitz–Stegun approximation of the standard normal CDF.
@@ -130,8 +130,79 @@ function CorrelationSim() {
   );
 }
 
+function BinWidthSim() {
+  const values = useMemo(
+    () => [...normals(211, 30, 20, 0.8), ...normals(212, 30, 26, 0.8)].map((v) => round(v, 1)),
+    [],
+  );
+  const choices = [4, 8, 14, 28];
+  const [idx, setIdx] = useState(0);
+  return (
+    <div className="ac-sim">
+      <Histogram values={values} bins={choices[idx]} xLabel="Cycle time (min)" />
+      <label className="ac-sim__control">
+        <span>
+          Number of bins: <strong>{choices[idx]}</strong>
+        </span>
+        <input
+          type="range"
+          min={0}
+          max={choices.length - 1}
+          step={1}
+          value={idx}
+          onChange={(e) => setIdx(Number(e.target.value))}
+        />
+      </label>
+      <div className="ac-sim__readout">
+        <span>Same 60 jobs. Only the bin width changed.</span>
+      </div>
+    </div>
+  );
+}
+
+const RUN_BASE = [19.5, 20.2, 20.8, 19.2, 20.4, 19.8, 20.1, 20.6, 19.4, 20.3, 19.9, 20.5, 19.7, 20.0, 20.7, 19.6];
+
+function RunShiftSim() {
+  const [shift, setShift] = useState(0);
+  const values = RUN_BASE.map((v, i) => round(i >= 8 ? v + shift : v, 1));
+  const second = values.slice(8);
+  const avg = second.reduce((a, b) => a + b, 0) / second.length;
+  return (
+    <div className="ac-sim">
+      <RunChart values={values} yLabel="Fill (g)" markFrom={shift > 0 ? 8 : undefined} />
+      <label className="ac-sim__control">
+        <span>
+          Shift added to the second half: <strong>+{shift.toFixed(1)}</strong>
+        </span>
+        <input
+          type="range"
+          min={0}
+          max={6}
+          step={0.5}
+          value={shift}
+          onChange={(e) => setShift(Number(e.target.value))}
+        />
+      </label>
+      <div className="ac-sim__readout">
+        <span>
+          Second-half mean: <strong>{avg.toFixed(1)} g</strong>
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export function Sim({ kind }: { kind: SimKind }) {
-  if (kind === 'resolution') return <ResolutionSim />;
-  if (kind === 'sampleSize') return <SampleSizeSim />;
-  return <CorrelationSim />;
+  switch (kind) {
+    case 'resolution':
+      return <ResolutionSim />;
+    case 'sampleSize':
+      return <SampleSizeSim />;
+    case 'correlation':
+      return <CorrelationSim />;
+    case 'binWidth':
+      return <BinWidthSim />;
+    case 'runShift':
+      return <RunShiftSim />;
+  }
 }

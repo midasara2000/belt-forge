@@ -1,5 +1,5 @@
 import type { MinitabOutput, Visual } from '../types';
-import { BoxPlot, Bars, DotStrip, Histogram, Scatter, StackedBars } from './Charts';
+import { BoxPlot, Bars, ControlChart, DotStrip, EffectsChart, Histogram, Pareto, ProbPlot, RunChart, Scatter, StackedBars } from './Charts';
 
 export function MinitabPanel({ output }: { output: MinitabOutput }) {
   return (
@@ -103,6 +103,39 @@ function ToolMatrix({ highlight }: { highlight?: keyof typeof MATRIX }) {
   );
 }
 
+function Fishbone({ effect, bones }: { effect: string; bones: { label: string; causes: string[] }[] }) {
+  return (
+    <div className="ac-fish" role="img" aria-label={`Cause-effect diagram for ${effect}`}>
+      <div className="ac-fish__bones">
+        {bones.map((b) => (
+          <div key={b.label} className="ac-fish__bone">
+            <strong>{b.label}</strong>
+            <ul>
+              {b.causes.map((c) => (
+                <li key={c}>{c}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+      <div className="ac-fish__head">{effect}</div>
+    </div>
+  );
+}
+
+function FlowStrip({ steps }: { steps: { label: string; note: string; kind: 'va' | 'nva' | 'wait' }[] }) {
+  return (
+    <div className="ac-flow" role="img" aria-label="Process steps with times">
+      {steps.map((s) => (
+        <div key={s.label} className={`ac-flow__step is-${s.kind}`}>
+          <strong>{s.label}</strong>
+          <span>{s.note}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function VisualView({ visual }: { visual: Visual }) {
   switch (visual.type) {
     case 'table':
@@ -141,6 +174,20 @@ export function VisualView({ visual }: { visual: Visual }) {
       return <StackedBars {...visual} />;
     case 'dotstrip':
       return <DotStrip {...visual} />;
+    case 'runChart':
+      return <RunChart {...visual} />;
+    case 'pareto':
+      return <Pareto {...visual} />;
+    case 'controlChart':
+      return <ControlChart {...visual} />;
+    case 'probPlot':
+      return <ProbPlot {...visual} />;
+    case 'effects':
+      return <EffectsChart effects={visual.effects} />;
+    case 'fishbone':
+      return <Fishbone effect={visual.effect} bones={visual.bones} />;
+    case 'flow':
+      return <FlowStrip steps={visual.steps} />;
     case 'dataTypeTree':
       return <DataTypeTree />;
     case 'toolMatrix':
