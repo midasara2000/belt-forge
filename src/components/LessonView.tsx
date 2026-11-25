@@ -53,7 +53,26 @@ export function LessonView({ lessonId, onBack, onPractice, resumeLabel, onResume
       {lesson.sections.map((s) => (
         <section key={s.heading} className="lesson__section">
           <h3>{s.heading}</h3>
-          <p>{s.body}</p>
+          {s.body.split(/\n\n+/).map((para, i) => {
+            const trimmed = para.trim();
+            if (!trimmed) return null;
+            if (trimmed.includes('\n- ') || trimmed.startsWith('- ')) {
+              const lines = trimmed.split('\n').map((l) => l.trim()).filter(Boolean);
+              const lead = lines[0].startsWith('- ') ? null : lines[0];
+              const items = lines.filter((l) => l.startsWith('- ')).map((l) => l.slice(2));
+              return (
+                <div key={`${s.heading}-${i}`}>
+                  {lead && <p>{lead}</p>}
+                  <ul>
+                    {items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            }
+            return <p key={`${s.heading}-${i}`}>{trimmed}</p>;
+          })}
         </section>
       ))}
 

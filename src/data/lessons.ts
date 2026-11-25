@@ -268,29 +268,44 @@ export const LESSONS: Lesson[] = [
     id: 'charts-variation',
     title: 'Variation & Graphical Tools',
     phase: 'measure',
-    topics: ['variation', 'charts', 'location-spread'],
+    topics: [
+      'variation',
+      'charts',
+      'location-spread',
+      'control-charts',
+      'multi-vari',
+      'stratification',
+    ],
     summary:
-      'See the process before you model it: histograms, Pareto, box/run/scatter plots, and the common vs special cause mindset.',
+      'Black Belt graphical literacy: choose the right plot, read shape/spread/time signals, separate common vs special cause, and know when short-term and long-term variation diverge.',
     visual: 'pareto',
     visualCaption: 'Pareto focuses the vital few categories that dominate total defects.',
     sections: [
       {
         heading: 'Common vs special cause',
-        body: 'Common cause is system noise; special cause is assignable. Tampering with common cause increases variation.',
+        body: 'Common cause variation is the stable “system noise” of the current process. Special cause variation is assignable — a spike, shift, or pattern that should trigger a reaction plan.\n\nTampering (reacting to every common-cause wiggle as if it were special) usually increases variation. Control charts exist to separate the two.',
       },
       {
-        heading: 'Chart chooser',
-        body: 'Pareto for categories, histogram for shape, box plot for group compare, run chart for time order, scatter for X–Y association.',
+        heading: 'Chart chooser (Black Belt)',
+        body: 'Match the question to the graph:\n- Pareto / bar: which categories dominate defects or cost?\n- Histogram: shape, modality, skew, gaps vs specs\n- Box plot: compare location & spread across groups (shift, supplier, cavity)\n- Run chart: time order without control limits — trends, shifts, clusters\n- Individuals / X̄-R / X̄-S / p / np / c / u charts: monitor stability with rational subgroups\n- Scatter: association between continuous X and Y (before regression)\n- Multi-vari: within-piece vs between-piece vs time / cavity components\n- Normal probability plot: check distributional shape assumptions',
       },
       {
-        heading: 'Location & spread',
-        body: 'Mean vs median (outliers), standard deviation/range for spread. Shape guides later analysis choices.',
+        heading: 'Reading values on the plot',
+        body: 'Histogram: look for bimodality (mixtures), heavy tails, and how much mass sits outside LSL/USL.\n\nBox plot: box = IQR; line = median; whiskers/outliers show tails. Median near one side of the box ⇒ skew.\n\nScatter: direction, strength, linearity, outliers, and clusters. A curved banana with near-zero linear r still has structure — plot first.\n\nControl chart: points beyond limits, runs on one side of the center line, trends, and oscillating patterns are signals — investigate before recalculating limits to “hide” them.',
+      },
+      {
+        heading: 'Short-term vs long-term variation',
+        body: 'Short-term (within-subgroup) variation estimates the process noise when conditions are relatively stable — often the σ behind Cp/Cpk “within”.\n\nLong-term (overall) variation includes shifts across time, lots, operators, and setups — often the σ behind Pp/Ppk and what the customer actually feels over months.\n\nIf long-term ≫ short-term, the process is not staying on one common-cause system: find and remove special-cause / between-batch drivers before claiming world-class capability.',
+      },
+      {
+        heading: 'Location & spread stats',
+        body: 'Mean is pulled by outliers; median is more resistant. Standard deviation and range describe spread. Never report only a mean — Black Belts always ask “relative to what spread, and is it stable?”',
       },
     ],
     takeaways: [
-      'Always look before you leap to tests.',
-      'Time order can reveal shifts summaries hide.',
-      'Pareto → focus; scatter → candidates for Analyze.',
+      'Graph before test — shape and time order change the analysis path.',
+      'Specs ≠ control limits; stable ≠ capable.',
+      'Long-term variation larger than short-term ⇒ between-group / time drivers still alive.',
     ],
   },
   {
@@ -299,29 +314,33 @@ export const LESSONS: Lesson[] = [
     phase: 'measure',
     topics: ['process-performance', 'capability', 'gate-measure'],
     summary:
-      'Quantify how bad the problem is (DPU, DPMO, ppm, yield) and whether the process can meet specs (Cp/Cpk) once stable and measured well.',
+      'Quantify how bad the problem is (DPU, DPMO, ppm, yield, RTY) and whether a stable, well-measured process can meet specs — including Cp/Cpk vs Pp/Ppk and short- vs long-term σ.',
     visual: 'capability',
     visualCaption: 'Cp = potential vs tolerance; Cpk also penalizes off-center processes.',
     sections: [
       {
-        heading: 'Defect metrics',
-        body: 'DPU = defects/units. DPMO = defects/(units×opportunities)×1e6. ppm often for defectives. Yield ≈ e^(−DPU) under random defect assumptions.',
+        heading: 'Defect & yield metrics',
+        body: 'DPU = defects / units. DPMO = defects / (units × opportunities) × 1,000,000 — normalizes complexity so processes can be compared.\n\nppm often tracks defectives (bad units). First-pass yield is good units / starts. Rolled throughput yield (RTY) multiplies independent step yields.\n\nUnder a Poisson-like defect model, yield ≈ e^(−DPU). Always lock operational definitions: defect ≠ defective; opportunities must be honest.',
       },
       {
-        heading: 'Cp vs Cpk',
-        body: 'Cp = (USL−LSL)/(6σ). Cpk accounts for centering. High Cp + low Cpk ⇒ recenter before buying precision.',
+        heading: 'Cp, Cpk, Pp, Ppk',
+        body: 'Cp = (USL − LSL) / (6σ_within) — potential capability if centered. Cpk = min( (USL−μ)/(3σ), (μ−LSL)/(3σ) ) — penalizes off-center location.\n\nPp / Ppk use overall (long-term) σ instead of within σ. High Cp with low Pp/Ppk often means the process wanders over time.\n\nHigh Cp + low Cpk ⇒ recenter (or retarget) before buying more precision. Both indices < 1 and similar ⇒ mainly a spread problem.',
       },
       {
-        heading: 'Stability first',
-        body: 'Capability on an unstable process misleads. Pair with control-chart thinking and trusted MSA.',
+        heading: 'One-sided specs & normality',
+        body: 'With only USL (or only LSL), use Cpu or Cpl — bilateral Cp is not defined the usual way. Predicted % out-of-spec from Cp/Cpk assumes a distributional model (often normal); check shape or use empirical / non-normal methods when tails matter.',
+      },
+      {
+        heading: 'Stability & MSA first',
+        body: 'Capability on an unstable process or a noisy gage is theater. Sequence: operational definition → MSA → stability view → then capability / DPMO baseline for the Measure gate.',
       },
     ],
     takeaways: [
-      'Bring a calculator for DPMO/Cp arithmetic.',
-      'Measure gate needs trusted baseline + MSA story.',
+      'Know which σ your software used (within vs overall).',
       'Specs ≠ control limits.',
+      'DGQ loves Cp vs Cpk and “stabilize before capability” traps.',
     ],
-    dgqAngle: 'Cp vs Cpk interpretation is a frequent item.',
+    dgqAngle: 'Cp vs Cpk interpretation and DPMO arithmetic are frequent items.',
   },
   {
     id: 'cause-fmea',
@@ -395,6 +414,14 @@ export const LESSONS: Lesson[] = [
         heading: 'Takt, throughput & efficiency',
         body: 'Takt = available production time / customer demand (the drumbeat). Compare cycle time at each step to takt to find overload. Throughput is output rate; WIP and lead time move together (Little’s Law: lead time ≈ WIP / throughput). Process cycle efficiency ≈ value-add time / lead time.',
       },
+      {
+        heading: 'Bottlenecks & capacity',
+        body: 'System throughput ≤ the constraint’s rate. Queues upstream + idle downstream usually mark the bottleneck. Elevating non-constraints first just grows WIP.\n\nCapacity ≈ available time / cycle time (then apply availability and quality losses). Line balance redistributes work so no station exceeds takt.',
+      },
+      {
+        heading: 'CFD & time analysis',
+        body: 'Cumulative flow diagrams show WIP bands by stage over time — widening bands mean growing queues. Value/time analysis separates value-add, required non-value, and pure waste so Improve knows what to attack.',
+      },
     ],
     takeaways: [
       'Match tool to symptom (motion → spaghetti; lead time → VSM).',
@@ -418,30 +445,71 @@ export const LESSONS: Lesson[] = [
       'regression',
       'Correlation',
       'Simple/Multiple/Logistic Regression',
+      't-test',
+      'proportion-test',
+      'chi-square',
+      'p-value',
+      'r-squared',
+      'independence',
     ],
     summary:
-      'Turn data into decisions: stratify, estimate with confidence intervals, test hypotheses, compare groups (ANOVA), and model relationships (regression).',
+      'Black Belt “data door”: choose the right analysis from Y’s data type, move from graphs → association → models, interpret p-values and R² honestly, and respect independence / short- vs long-term variation.',
     visual: 'hypothesis',
     visualCaption: 'p-value vs α: reject H0 when evidence against the null is strong enough — still check practical size.',
     sections: [
       {
-        heading: 'Stratify first',
-        body: 'Slice by shift, product, site… Many mysteries dissolve before formal tests.',
+        heading: 'Analyze roadmap (through the data door)',
+        body: 'Typical Black Belt sequence:\n- Clarify Y and the decision (compare groups? associate X–Y? prove a shift?)\n- Confirm MSA / operational definitions so you are not modeling noise\n- Graph and stratify (shape, time order, mixtures)\n- Estimate with confidence intervals where useful\n- Pick a hypothesis test or model matched to data type\n- Check assumptions / residuals\n- Judge statistical and practical significance\n- Only then name vital X’s for Improve\n\nSkipping graphs and jumping to p-values is a classic DGQ trap.',
       },
       {
-        heading: 'Hypothesis tests',
-        body: 'α is Type I risk (false alarm). p ≤ α → reject H0. Non-significance ≠ proof of equality.',
+        heading: 'Continuous Y vs discrete / attribute Y',
+        body: 'This single fork drives almost every tool choice.\n\nContinuous Y (cycle time, dimension, temperature, cost):\n- Summaries: mean, SD, median, percentiles\n- Compare means: 1-sample t, 2-sample t, paired t, one-/two-way ANOVA\n- Relate X→Y: correlation, simple/multiple regression\n- Variation over time: Individuals / X̄ charts, capability on continuous scale\n\nDiscrete / attribute Y (pass/fail, defect count, categories):\n- Rates: proportion defective, DPU, DPMO\n- Compare proportions: 1-proportion, 2-proportion tests\n- Association of categories: Chi-square test of independence (contingency tables)\n- Counts per unit/area: Poisson / c or u thinking; logistic regression for binary Y with predictors\n\nRule of thumb: ANOVA and classic t-tests need a continuous (or well-approximated) Y. Do not ANOVA pass/fail 0/1 data as if it were a normal measurement without understanding the limitations — use proportion / chi-square / logistic paths instead.',
       },
       {
-        heading: 'ANOVA & regression',
-        body: 'One-way ANOVA: means across 3+ levels. Interactions matter in two-way. Correlation ≠ causation; logistic fits binary Y.',
+        heading: 'Stratification, dependence & confounding',
+        body: 'Stratify by shift, product, machine, site, customer segment… Many “mysteries” are mixtures of two processes.\n\nIndependence matters: if observations are clustered (same batch, same patient, repeated measures on one unit), ordinary tests inflate false confidence. Use pairing, blocking, mixed models, or analyze at the right aggregation level.\n\nConfounding: X₁ and X₂ travel together (e.g. new machine always on night shift). Observed association may belong to the confounder — designed experiments and careful observational controls untangle dependencies.',
+      },
+      {
+        heading: 'Confidence intervals',
+        body: 'A 95% CI for a mean (or difference, or proportion) is a range of plausible values for the parameter given the data and assumptions — not “95% of future individual units fall here.”\n\nIf a CI for a difference includes 0, “no difference” remains plausible at that confidence level. Narrower intervals need more data or less noise — not wishful α changes.',
+      },
+      {
+        heading: 'Hypothesis testing language',
+        body: 'H0 = the skeptical default (often “no difference / no association”). H1 = the alternative you care about.\n\nα (significance level) = Type I risk — probability of a false alarm (reject true H0). Commonly 0.05 or 0.01.\n\np-value = probability, under H0, of data at least as extreme as observed. If p ≤ α, reject H0.\n\nType II error (β) = missing a real effect. Power = 1 − β. Underpowered studies (tiny n) often produce large p-values even when a meaningful effect exists — “fail to reject” is not proof of equality.\n\nStatistical significance ≠ practical significance. A tiny shift can be “significant” with huge n; a useful shift can be missed with small n. Always pair p with effect size and business impact.',
+      },
+      {
+        heading: 'Test chooser (means & proportions)',
+        body: 'Continuous Y:\n- 1-sample t: one mean vs a target / historical value\n- 2-sample t: means of two independent groups (check variance assumptions)\n- Paired t: before/after on the same unit, or matched pairs (removes between-unit noise)\n- One-way ANOVA: means across 3+ levels of one factor; follow with contrasts / post-hoc if significant\n- Two-way ANOVA: two factors; interpret interaction first — the effect of A may depend on B\n\nAttribute / discrete Y:\n- 1-proportion: one rate vs a standard\n- 2-proportion: compare two independent rates\n- Chi-square test of independence: is category of X associated with category of Y in a table?\n- Chi-square goodness-of-fit: do observed counts match an expected distribution?\n\nEqual-variance checks (e.g. Levene) and residual plots tell you when a plain t/ANOVA story is shaky — transform, use Welch-type methods, or nonparametrics when assumptions fail badly.',
+      },
+      {
+        heading: 'ANOVA in practice',
+        body: 'One-way ANOVA asks whether at least one group mean differs. A small p does not say which groups differ or that every pair differs — use planned contrasts or post-hoc comparisons plus practical judgment.\n\nTwo-way ANOVA adds factor B and A×B interaction. Significant interaction means you must not quote a single main-effect story for A without showing how it changes across B — always plot the interaction.\n\nANOVA residual diagnostics (Independence, roughly equal variance, approximate normality of residuals) protect you from pretty p-values on ugly data.',
+      },
+      {
+        heading: 'Correlation → regression → p-values',
+        body: 'Scatter first. Correlation (e.g. Pearson r) summarizes linear association strength/direction between two continuous variables. r near 0 can still hide nonlinear structure.\n\nCorrelation ≠ causation. A tight cloud can be driven by a lurking third variable or by process physics you have not manipulated.\n\nSimple linear regression: Ŷ = b0 + b1X. The slope’s p-value tests whether a linear association is detectable; the coefficient estimates how Y changes per unit X inside the data range.\n\nResiduals = Y − Ŷ. Fan shapes ⇒ unequal variance; curves ⇒ wrong form; wild points ⇒ influence. Fix the model before trusting coefficients.\n\nExtrapolation beyond the observed X range is risky — the fitted line is a local story.',
+      },
+      {
+        heading: 'Reading R² (and friends)',
+        body: 'R² = fraction of Y’s variance accounted for by the model. R² = 0.15 with p = 0.001 means “detectable but weak explanation.” R² = 0.9 can still be useless if residuals are patterned or the range is artificial.\n\nAdjusted R² penalizes extra predictors. In multiple regression, check VIF / collinearity: interdependent X’s make individual coefficients unstable even if overall prediction looks fine.\n\nLogistic regression is the usual path when Y is binary (pass/fail): model probability / log-odds, not a straight least-squares line through 0/1.',
+      },
+      {
+        heading: 'Multiple predictors & interdependencies',
+        body: 'When several X’s move together (temperature with humidity, speed with feed), observational regression cannot cleanly “credit” one factor — coefficients become interdependent.\n\nDesigned experiments (DOE) break many of those dependencies by orthogonal (or near-orthogonal) factor settings. Observationally, prefer process knowledge, stratification, and carefully chosen covariates — and be humble about causal claims.',
+      },
+      {
+        heading: 'Short-term vs long-term in Analyze',
+        body: 'A significant mean difference between two weeks may be a special-cause episode, not a new permanent process. Separate:\n- Within-lot / within-subgroup noise (short-term)\n- Between-lot, between-day, between-shift movement (long-term)\n\nImprove actions differ: reduce common-cause spread vs eliminate the assignable drivers of wandering. Capability and hypothesis results should name which variation you attacked.',
       },
     ],
     takeaways: [
-      'Plot + stratify before fancy models.',
-      'Statistical ≠ practical significance.',
-      'Check assumptions and residuals.',
+      'Data type of Y chooses the family: t/ANOVA/regression vs proportion/chi-square/logistic.',
+      'p ≤ α rejects H0 — it does not measure importance; R² and effect size speak to strength.',
+      'Interaction, confounding, and non-independence break naive one-factor stories.',
+      'Graph → stratify → test/model → residual check → practical decision.',
     ],
+    dgqAngle:
+      'Expect “which test?” scenarios, p-value wording traps, Cp/Cpk vs stability, and correlation-vs-causation items.',
   },
   {
     id: 'doe',
@@ -457,27 +525,35 @@ export const LESSONS: Lesson[] = [
       'Variation Reduction',
     ],
     summary:
-      'DOE efficiently learns which factors and interactions drive Y. Screen with fractionals, deepen with full factorials, optimize curvature with RSM.',
+      'DOE is how Black Belts learn causal factor effects and interactions efficiently: screen → confirm → optimize, with randomization, blocking, and honest handling of aliasing.',
     visual: 'doe',
     visualCaption: '2³ full factorial = 8 unique corners of the factor cube (before replicates).',
     sections: [
       {
         heading: 'Why not OFAT',
-        body: 'One-factor-at-a-time misses interactions and wastes runs. Designed experiments balance learning and cost.',
+        body: 'One-factor-at-a-time misses interactions, confuses time drift with factor effects, and wastes runs. A designed experiment sets factor levels deliberately so effects and (where possible) interactions are estimable.',
       },
       {
-        heading: 'Factorials',
-        body: 'Full 2^k explores all combinations. Fractionals screen many factors with aliasing tradeoffs (resolution).',
+        heading: 'Full vs fractional factorials',
+        body: 'Full 2^k runs every corner combination (2³ = 8 unique runs before replicates). Use when factors are few and interactions matter.\n\nFractional 2^(k−p) screens many factors with fewer runs. Resolution describes aliasing: Resolution III aliases main effects with two-factor interactions — fine for rough screens, dangerous if you treat every “significant” effect as proven alone. Follow screens with confirmation or a higher-resolution design.',
       },
       {
-        heading: 'Randomize & block',
-        body: 'Randomize run order against time bias; block known nuisance factors. RSM comes after vital factors are known.',
+        heading: 'Center points, curvature & RSM',
+        body: 'Center points detect curvature / lack of fit vs a pure linear factorial model. When you are near an optimum and curvature matters, move to response surface methods (RSM) on the vital few factors.',
+      },
+      {
+        heading: 'Randomize, block, replicate',
+        body: 'Randomize run order against lurking time trends. Block known nuisance factors (day, batch, machine). Replicates estimate pure error and improve power. Analyze with effect plots and residual checks — the same discipline as regression.',
+      },
+      {
+        heading: 'Link back to observational Analyze',
+        body: 'Scatter/regression on historical data generates hypotheses; DOE tests them by breaking collinear process settings. After DOE, confirm in the real process window and lock gains in Control.',
       },
     ],
     takeaways: [
-      '2³ → 8 runs (no replicates).',
-      'Screen → confirm → optimize.',
-      'Randomization is not optional folklore.',
+      '2³ → 8 corner runs (no replicates).',
+      'Screen (fractional) → confirm → optimize (RSM).',
+      'Aliasing means “significant C” might be AB — de-alias before you spend capital.',
     ],
   },
   {

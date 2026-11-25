@@ -1253,3 +1253,19 @@ button {
     transform: translateY(-2px);
   }
 }
+
+.lesson__section ul {
+  margin: 0.35rem 0 0.85rem;
+  padding-left: 1.15rem;
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+.lesson__section ul li {
+  margin-bottom: 0.35rem;
+}
+
+.lesson__section p {
+  margin: 0 0 0.75rem;
+  line-height: 1.55;
+}
