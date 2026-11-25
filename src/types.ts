@@ -19,7 +19,8 @@ export type GameMode =
   | 'calc'
   | 'review'
   | 'achievements'
-  | 'phase';
+  | 'phase'
+  | 'path';
 
 export interface Question {
   id: string;
@@ -112,6 +113,8 @@ export interface ProgressState {
   dailyGoal: number;
   dailyCorrect: number;
   dailyDate: string | null;
+  /** Lesson IDs opened/studied on the Skill Path (for crown unlocks). */
+  pathStudied: string[];
 }
 
 export interface SessionConfig {

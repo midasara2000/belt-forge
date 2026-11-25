@@ -37,6 +37,14 @@ export function useProgress() {
     setProgress(resetProgress());
   }, []);
 
+  const markLessonStudied = useCallback((lessonId: string) => {
+    setProgress((prev) => {
+      const pathStudied = prev.pathStudied ?? [];
+      if (pathStudied.includes(lessonId)) return prev;
+      return { ...prev, pathStudied: [...pathStudied, lessonId], xp: prev.xp + 8 };
+    });
+  }, []);
+
   const rank = useMemo(() => beltRank(progress.xp), [progress.xp]);
 
   const weak = useMemo(() => weakTopics(progress, 8), [progress]);
@@ -112,6 +120,7 @@ export function useProgress() {
     completeBaseline,
     recordMock,
     reset,
+    markLessonStudied,
     unlockedAchievements,
   };
 }

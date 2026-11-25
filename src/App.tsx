@@ -4,13 +4,16 @@ import { LearnLibrary } from './components/LearnLibrary';
 import { LessonView } from './components/LessonView';
 import { QuizSession, type QuizSnapshot } from './components/QuizSession';
 import { Results } from './components/Results';
+import { SkillPath } from './components/SkillPath';
 import { VersionMark } from './components/VersionMark';
 import { APP_BUILD_LABEL } from './version';
 import { ACHIEVEMENTS } from './data/achievements';
 import { getLessonForTopic } from './data/lessons';
+import { getSkillNodeByLesson } from './data/skillPath';
 import { ALL_QUESTIONS, questionCount, questionsForLesson } from './data/questions';
 import { PHASES, PHASE_ORDER, TOPICS, phaseLabel } from './data/topics';
 import { useProgress } from './hooks/useProgress';
+import { pathSummary } from './lib/skillPathProgress';
 import { balancedBaseline, pickQuestions, shuffle } from './lib/scoring';
 import type { Phase, Question, SessionConfig } from './types';
 import './App.css';
@@ -24,6 +27,8 @@ type ResultsScreen = {
   missed: Question[];
 };
 
+type PathScreen = { kind: 'path'; selectedId?: string | null };
+
 type Screen =
   | { kind: 'hub' }
   | { kind: 'quiz'; config: SessionConfig; snapshot?: QuizSnapshot | null }
@@ -32,12 +37,14 @@ type Screen =
   | { kind: 'achievements' }
   | { kind: 'guide' }
   | { kind: 'learn'; highlightIds?: string[] }
+  | PathScreen
   | {
       kind: 'lesson';
       lessonId: string;
       returnTo:
         | { kind: 'hub' }
         | { kind: 'learn'; highlightIds?: string[] }
+        | PathScreen
         | { kind: 'quiz'; config: SessionConfig; snapshot?: QuizSnapshot | null }
         | ResultsScreen;
     };
@@ -52,9 +59,11 @@ export default function App() {
     completeBaseline,
     recordMock,
     reset,
+    markLessonStudied,
   } = useProgress();
 
   const [screen, setScreen] = useState<Screen>({ kind: 'hub' });
+  const pathMeta = useMemo(() => pathSummary(progress), [progress]);
 
   const dailyPct = Math.min(100, Math.round((progress.dailyCorrect / progress.dailyGoal) * 100));
 
@@ -149,13 +158,38 @@ export default function App() {
 
   function practiceLesson(lessonId: string) {
     const pool = questionsForLesson(lessonId);
+    const skill = getSkillNodeByLesson(lessonId);
     startSession({
-      mode: 'blindspot',
-      title: 'Lesson practice',
+      mode: skill ? 'path' : 'blindspot',
+      title: skill ? `Checkpoint · ${skill.title}` : 'Lesson practice',
       questions: shuffle(pool).slice(0, Math.min(10, pool.length)),
       timed: false,
       seconds: null,
       passPercent: null,
+      showImmediateFeedback: true,
+    });
+  }
+
+  function openPathLesson(lessonId: string, selectedId?: string | null) {
+    markLessonStudied(lessonId);
+    setScreen({
+      kind: 'lesson',
+      lessonId,
+      returnTo: { kind: 'path', selectedId: selectedId ?? getSkillNodeByLesson(lessonId)?.id },
+    });
+  }
+
+  function startPathCheckpoint(lessonId: string) {
+    markLessonStudied(lessonId);
+    const pool = questionsForLesson(lessonId);
+    const skill = getSkillNodeByLesson(lessonId);
+    startSession({
+      mode: 'path',
+      title: skill ? `Checkpoint · ${skill.title}` : 'Path checkpoint',
+      questions: shuffle(pool).slice(0, Math.min(8, pool.length)),
+      timed: false,
+      seconds: null,
+      passPercent: 70,
       showImmediateFeedback: true,
     });
   }
@@ -190,13 +224,31 @@ export default function App() {
         <LearnLibrary
           highlightIds={screen.highlightIds}
           onBack={() => setScreen({ kind: 'hub' })}
-          onOpenLesson={(id) =>
+          onOpenLesson={(id) => {
+            markLessonStudied(id);
             setScreen({
               kind: 'lesson',
               lessonId: id,
               returnTo: { kind: 'learn', highlightIds: screen.highlightIds },
-            })
-          }
+            });
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (screen.kind === 'path') {
+    return (
+      <div className="app-shell">
+        <VersionMark />
+        <SkillPath
+          progress={progress}
+          selectedId={screen.selectedId}
+          onBack={() => setScreen({ kind: 'hub' })}
+          onOpenNode={(node) => setScreen({ kind: 'path', selectedId: node.id })}
+          onCloseDetail={() => setScreen({ kind: 'path', selectedId: null })}
+          onStudy={(lessonId) => openPathLesson(lessonId, screen.selectedId)}
+          onCheckpoint={startPathCheckpoint}
         />
       </div>
     );
@@ -265,14 +317,23 @@ export default function App() {
           percent={screen.percent}
           passPercent={screen.config.passPercent}
           missed={screen.missed}
-          onHome={() => setScreen({ kind: 'hub' })}
-          onStudyLesson={(lessonId) =>
+          onHome={() =>
+            setScreen(
+              screen.config.mode === 'path'
+                ? { kind: 'path', selectedId: getSkillNodeByLesson(
+                    screen.config.questions[0]?.lessonId ?? '',
+                  )?.id }
+                : { kind: 'hub' },
+            )
+          }
+          onStudyLesson={(lessonId) => {
+            markLessonStudied(lessonId);
             setScreen({
               kind: 'lesson',
               lessonId,
               returnTo: screen,
-            })
-          }
+            });
+          }}
           onOpenLearnMisses={() =>
             setScreen({ kind: 'learn', highlightIds: missLessonIds })
           }
@@ -284,7 +345,17 @@ export default function App() {
             else if (mode === 'blindspot') startBlindspot();
             else if (mode === 'toolmatch') startToolMatch();
             else if (mode === 'calc') startCalc();
-            else setScreen({ kind: 'hub' });
+            else if (mode === 'path') {
+              const title = screen.config.title;
+              const skillTitle = title.startsWith('Checkpoint · ')
+                ? title.slice('Checkpoint · '.length)
+                : null;
+              const node = skillTitle
+                ? pathMeta.nodes.find((n) => n.node.title === skillTitle)?.node
+                : undefined;
+              if (node) startPathCheckpoint(node.lessonId);
+              else setScreen({ kind: 'path' });
+            } else setScreen({ kind: 'hub' });
           }}
           onRetryMissed={() =>
             startSession({
@@ -400,7 +471,11 @@ export default function App() {
           <section>
             <h3>How to use this coach</h3>
             <ol>
-              <li>Browse Learn & recap for visuals and teaching cards.</li>
+              <li>
+                Prefer Skill Path for a Duolingo-style tree: read → checkpoint → crowns unlock the
+                next DMAIC skill.
+              </li>
+              <li>Or browse Learn & recap freely when you want a library view.</li>
               <li>Run the Baseline once to map phase strengths.</li>
               <li>On misses, tap Study to open the linked lesson, then practice that topic.</li>
               <li>Sit a full Mock Exam under the 90-minute timer before the real day.</li>
@@ -494,8 +569,24 @@ export default function App() {
         <h2 className="section-title">Play modes</h2>
         <div className="mode-grid">
           <ModeCard
+            title="Skill Path"
+            blurb="Duolingo-style DMAIC tree: read each skill in depth, checkpoint-test it, earn crowns to unlock the next."
+            action={
+              pathMeta.next
+                ? `Continue · ${pathMeta.next.node.badge} (${pathMeta.crowned}/${pathMeta.total})`
+                : 'Open path'
+            }
+            accent="#0f3d33"
+            onClick={() =>
+              setScreen({
+                kind: 'path',
+                selectedId: pathMeta.next?.node.id ?? null,
+              })
+            }
+          />
+          <ModeCard
             title="Learn & Recap"
-            blurb="Teaching cards with diagrams — SIPOC, MSA, Cp/Cpk, DOE, pull, and more."
+            blurb="Free library of teaching cards with diagrams — browse any topic without unlock order."
             action="Open library"
             accent="#134e41"
             onClick={() => setScreen({ kind: 'learn' })}

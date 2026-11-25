@@ -40,6 +40,7 @@ export function defaultProgress(): ProgressState {
     dailyGoal: 15,
     dailyCorrect: 0,
     dailyDate: today,
+    pathStudied: [],
   };
 }
 
@@ -57,6 +58,7 @@ export function loadProgress(): ProgressState {
     for (const p of PHASE_ORDER) {
       if (!parsed.phaseStats[p]) parsed.phaseStats[p] = { correct: 0, total: 0 };
     }
+    if (!Array.isArray(parsed.pathStudied)) parsed.pathStudied = [];
     return parsed;
   } catch {
     return defaultProgress();
