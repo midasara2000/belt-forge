@@ -5,6 +5,7 @@ import { LessonView } from './components/LessonView';
 import { QuizSession, type QuizSnapshot } from './components/QuizSession';
 import { Results } from './components/Results';
 import { SkillPath } from './components/SkillPath';
+import { Academy } from './academy/Academy';
 import { VersionMark } from './components/VersionMark';
 import { APP_BUILD_LABEL } from './version';
 import { ACHIEVEMENTS } from './data/achievements';
@@ -38,6 +39,7 @@ type Screen =
   | { kind: 'guide' }
   | { kind: 'learn'; highlightIds?: string[] }
   | PathScreen
+  | { kind: 'academy' }
   | {
       kind: 'lesson';
       lessonId: string;
@@ -233,6 +235,15 @@ export default function App() {
             });
           }}
         />
+      </div>
+    );
+  }
+
+  if (screen.kind === 'academy') {
+    return (
+      <div className="app-shell">
+        <VersionMark />
+        <Academy onExit={() => setScreen({ kind: 'hub' })} />
       </div>
     );
   }
@@ -568,6 +579,13 @@ export default function App() {
       <section className="modes">
         <h2 className="section-title">Play modes</h2>
         <div className="mode-grid">
+          <ModeCard
+            title="Analyze Academy"
+            blurb="Interactive building blocks: label data, pick the tool, read Minitab output, drag sliders. Bite-sized cards with instant checks."
+            action="Start learning"
+            accent="#3d4a6b"
+            onClick={() => setScreen({ kind: 'academy' })}
+          />
           <ModeCard
             title="Skill Path"
             blurb="Duolingo-style DMAIC tree: read each skill in depth, checkpoint-test it, earn crowns to unlock the next."
