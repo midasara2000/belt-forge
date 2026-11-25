@@ -4,6 +4,8 @@ import { LearnLibrary } from './components/LearnLibrary';
 import { LessonView } from './components/LessonView';
 import { QuizSession, type QuizSnapshot } from './components/QuizSession';
 import { Results } from './components/Results';
+import { VersionMark } from './components/VersionMark';
+import { APP_BUILD_LABEL } from './version';
 import { ACHIEVEMENTS } from './data/achievements';
 import { getLessonForTopic } from './data/lessons';
 import { ALL_QUESTIONS, questionCount, questionsForLesson } from './data/questions';
@@ -169,6 +171,7 @@ export default function App() {
     const returnTo = screen.returnTo;
     return (
       <div className="app-shell">
+        <VersionMark />
         <LessonView
           lessonId={screen.lessonId}
           onBack={() => setScreen(returnTo)}
@@ -183,6 +186,7 @@ export default function App() {
   if (screen.kind === 'learn') {
     return (
       <div className="app-shell">
+        <VersionMark />
         <LearnLibrary
           highlightIds={screen.highlightIds}
           onBack={() => setScreen({ kind: 'hub' })}
@@ -201,6 +205,7 @@ export default function App() {
   if (screen.kind === 'quiz') {
     return (
       <div className="app-shell">
+        <VersionMark />
         <QuizSession
           key={`${screen.config.title}-${screen.snapshot?.index ?? 'start'}-${screen.config.questions[0]?.id}`}
           config={screen.config}
@@ -252,6 +257,7 @@ export default function App() {
 
     return (
       <div className="app-shell">
+        <VersionMark />
         <Results
           title={screen.config.title}
           correct={screen.correct}
@@ -299,6 +305,7 @@ export default function App() {
   if (screen.kind === 'phase-pick') {
     return (
       <div className="app-shell">
+        <VersionMark />
         <button type="button" className="ghost back" onClick={() => setScreen({ kind: 'hub' })}>
           ← Hub
         </button>
@@ -332,6 +339,7 @@ export default function App() {
   if (screen.kind === 'achievements') {
     return (
       <div className="app-shell">
+        <VersionMark />
         <button type="button" className="ghost back" onClick={() => setScreen({ kind: 'hub' })}>
           ← Hub
         </button>
@@ -357,6 +365,7 @@ export default function App() {
   if (screen.kind === 'guide') {
     return (
       <div className="app-shell guide">
+        <VersionMark />
         <button type="button" className="ghost back" onClick={() => setScreen({ kind: 'hub' })}>
           ← Hub
         </button>
@@ -405,6 +414,7 @@ export default function App() {
   // HUB
   return (
     <div className="app-shell hub">
+      <VersionMark />
       <header className="hero">
         <div className="hero__brand">
           <p className="eyebrow">UMS curriculum · DGQ exam prep</p>
@@ -562,6 +572,9 @@ export default function App() {
         <p>
           Practice content inspired by UMS DMAIC tool map for DGQ Black Belt prep. Not affiliated
           with DGQ or UMS; not a substitute for official training materials or your project work.
+        </p>
+        <p className="foot__build">
+          Build {APP_BUILD_LABEL} — if this doesn’t match the chat, hard-refresh (or clear cache).
         </p>
       </footer>
     </div>
