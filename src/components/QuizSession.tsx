@@ -1,14 +1,24 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getLessonForTopic } from '../data/lessons';
 import { phaseLabel } from '../data/topics';
-import { formatTime } from '../lib/scoring';
+import { formatTime, shuffle } from '../lib/scoring';
 import type { Question, SessionConfig } from '../types';
+
+/** Per-presentation choice order — not stored on the canonical question. */
+export interface ChoicePresentation {
+  choices: string[];
+  /** Index of the correct choice in `choices` for this shuffle */
+  correctIndex: number;
+}
 
 export interface QuizSnapshot {
   index: number;
   correctCount: number;
   missed: Question[];
   secondsLeft: number | null;
+  /** Keep the same shuffle when returning from a lesson mid-question */
+  presentation: ChoicePresentation | null;
+  showingFeedback: boolean;
 }
 
 interface Props {
@@ -23,6 +33,14 @@ interface Props {
     missed: Question[];
   }) => void;
   onStudyLesson: (lessonId: string, snapshot: QuizSnapshot) => void;
+}
+
+function freshPresentation(q: Question): ChoicePresentation {
+  const order = shuffle([0, 1, 2, 3]);
+  return {
+    choices: order.map((i) => q.choices[i]),
+    correctIndex: order.indexOf(q.correctIndex),
+  };
 }
 
 export function QuizSession({
@@ -44,26 +62,39 @@ export function QuizSession({
   const [combo, setCombo] = useState(0);
   const [flash, setFlash] = useState<'good' | 'bad' | null>(null);
   const [finished, setFinished] = useState(false);
-  /** After returning from a lesson on a wrong answer, show feedback again */
   const [restoredMiss, setRestoredMiss] = useState(false);
+  const [presentation, setPresentation] = useState<ChoicePresentation | null>(
+    initial?.presentation ?? null,
+  );
 
   const q = config.questions[index];
   const total = config.questions.length;
   const progressPct = ((index + (locked || restoredMiss ? 1 : 0)) / total) * 100;
 
-  const lesson = useMemo(() => {
-    if (!q) return undefined;
-    return getLessonForTopic(q.topic, q.phase);
-  }, [q]);
+  // Lesson links use stable topic / lessonId — never the A/B/C/D letter
+  const lesson = useMemo(
+    () => (q ? getLessonForTopic(q.topic, q.phase) : undefined),
+    [q],
+  );
+
+  // New question → new random shuffle (keep saved shuffle when resuming after Study)
+  useEffect(() => {
+    if (!q) return;
+    if (initial?.presentation && initial.index === index) {
+      setPresentation(initial.presentation);
+      return;
+    }
+    setPresentation(freshPresentation(q));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q?.id, index]);
 
   useEffect(() => {
-    if (initial && missed.some((m) => m.id === config.questions[initial.index]?.id)) {
+    if (initial?.showingFeedback) {
       setLocked(true);
       setRestoredMiss(true);
       setFlash('bad');
       setSelected(-1);
     }
-    // only on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -93,15 +124,18 @@ export function QuizSession({
       correctCount,
       missed,
       secondsLeft: config.timed ? secondsLeft : null,
+      presentation,
+      showingFeedback: locked && config.showImmediateFeedback,
     };
   }
 
   function choose(i: number) {
-    if (locked || finished || restoredMiss) return;
+    if (!presentation || locked || finished || restoredMiss) return;
     setSelected(i);
-    const ok = i === q.correctIndex;
+    const ok = i === presentation.correctIndex;
     setLocked(true);
     setFlash(ok ? 'good' : 'bad');
+    // Progress / lesson stats always key off the canonical question (topic, lessonId)
     onAnswer(q, ok);
     const nextCorrect = correctCount + (ok ? 1 : 0);
     const nextMissed = ok ? missed : [...missed, q];
@@ -133,11 +167,12 @@ export function QuizSession({
     return 'Knowledge';
   }, [q]);
 
-  if (!q) return null;
+  if (!q || !presentation) return null;
   if (finished) return null;
 
   const showFeedback = locked && config.showImmediateFeedback;
-  const wrong = showFeedback && (restoredMiss || selected !== q.correctIndex);
+  const wrong =
+    showFeedback && (restoredMiss || (selected !== null && selected !== presentation.correctIndex));
 
   return (
     <div className={`quiz ${flash ? `quiz--${flash}` : ''}`}>
@@ -171,15 +206,15 @@ export function QuizSession({
         </div>
         <h2 className="quiz__prompt">{q.prompt}</h2>
         <div className="quiz__choices">
-          {q.choices.map((choice, i) => {
+          {presentation.choices.map((choice, i) => {
             let cls = 'choice';
             if (showFeedback) {
-              if (i === q.correctIndex) cls += ' choice--correct';
+              if (i === presentation.correctIndex) cls += ' choice--correct';
               else if (i === selected && selected >= 0) cls += ' choice--wrong';
             } else if (selected === i) cls += ' choice--picked';
             return (
               <button
-                key={i}
+                key={`${q.id}-${i}-${choice.slice(0, 12)}`}
                 type="button"
                 className={cls}
                 onClick={() => choose(i)}
