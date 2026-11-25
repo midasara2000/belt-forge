@@ -1,5 +1,5 @@
 /** Bump when shipping a user-visible change — match this string in chat. */
-export const APP_VERSION = '1.5.0';
+export const APP_VERSION = '1.6.0';
 
 export const APP_BUILD_LABEL = `v${APP_VERSION}`;
 
