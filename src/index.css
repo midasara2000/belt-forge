@@ -1,0 +1,4 @@
+/* Global resets live in App.css for this single-app coach */
+html {
+  -webkit-text-size-adjust: 100%;
+}

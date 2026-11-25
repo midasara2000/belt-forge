@@ -1,0 +1,975 @@
+import type { Question } from '../types';
+
+export const defineMeasureQuestions: Question[] = [
+  // ─── DEFINE (28) ───────────────────────────────────────────────────────────
+  {
+    id: 'def-001',
+    phase: 'define',
+    topic: 'project-charter',
+    type: 'mcq',
+    difficulty: 'foundation',
+    prompt: 'Which elements belong in a solid Project Charter?',
+    choices: [
+      'Business case, problem/goal statements, scope, team, timeline, and primary metric (Y)',
+      'Only a list of solutions the sponsor already prefers',
+      'Detailed DOE worksheet and control plan',
+      'Full financial statements of the company for 10 years',
+    ],
+    correctIndex: 0,
+    explanation:
+      'The charter aligns sponsor and team on why the project exists, what “done” means, boundaries, and how success is measured.\n\nDOE sheets and control plans belong later; they are not charter content.',
+  },
+  {
+    id: 'def-002',
+    phase: 'define',
+    topic: 'project-charter',
+    type: 'scenario',
+    difficulty: 'belt',
+    prompt:
+      'A charter says: “Improve customer satisfaction somehow.” What is the biggest issue?',
+    choices: [
+      'The goal is vague — it lacks a measurable Y, baseline, and target',
+      'It mentions customers, which is not allowed in Define',
+      'Charters must never mention satisfaction',
+      'Nothing — vague goals keep options open',
+    ],
+    correctIndex: 0,
+    explanation:
+      'SMART problem/goal statements with a defined metric, baseline, and target are essential for DGQ-style project discipline.\n\nVague wishes cannot be gated or verified.',
+    dgqTip: 'Vague charters are a classic exam distractor — always look for measurable Y.',
+  },
+  {
+    id: 'def-003',
+    phase: 'define',
+    topic: 'benefit-calculation',
+    type: 'mcq',
+    difficulty: 'belt',
+    prompt: 'What is a hard (hard dollar) project benefit?',
+    choices: [
+      'A financially traceable saving or revenue effect verified with Finance',
+      'Any improvement the team feels good about',
+      'Only CO₂ reductions without cost impact',
+      'Training hours completed by Yellow Belts',
+    ],
+    correctIndex: 0,
+    explanation:
+      'UMS/DGQ benefit logic distinguishes hard benefits (P&L impact) from soft benefits (morale, image, risk reduction).\n\nFinance validation strengthens credibility at Gate Reviews.',
+  },
+  {
+    id: 'def-004',
+    phase: 'define',
+    topic: 'benefit-calculation',
+    type: 'calc',
+    difficulty: 'belt',
+    prompt:
+      'A line makes 80,000 units/year. Scrap is 4.0% at €25 per scrap unit. Target scrap is 1.5%. What is the annual hard-savings potential from scrap alone?',
+    choices: [
+      '€30,000',
+      '€50,000',
+      '€80,000',
+      '€100,000',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Scrap reduction = 4.0% − 1.5% = 2.5 percentage points.\nUnits saved = 80,000 × 0.025 = 2,000.\nSavings = 2,000 × €25 = €50,000/year.\n\nA common mistake is using only the new rate (1.5%) or forgetting the percentage-point difference.',
+    dgqTip: 'Calculator allowed. Separate hard savings (cash) from soft benefits.',
+  },
+  {
+    id: 'def-005',
+    phase: 'define',
+    topic: 'project-frame',
+    type: 'scenario',
+    difficulty: 'belt',
+    prompt:
+      'Stakeholders keep expanding the project into three plants and a new IT system. Which Define tool re-clarifies boundaries?',
+    choices: [
+      'Project Frame / in-scope vs out-of-scope framing',
+      'Response Surface Methodology',
+      'Control chart Western Electric rules',
+      'Two-bin Kanban sizing',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Project framing protects focus: which process, which Y, what is explicitly out of scope.\n\nScope creep without re-chartering is a common failure mode.',
+  },
+  {
+    id: 'def-006',
+    phase: 'define',
+    topic: 'multi-generation-plan',
+    type: 'mcq',
+    difficulty: 'belt',
+    prompt: 'When is a Multi-Generation Plan most useful?',
+    choices: [
+      'When the vision is large and must be delivered in sequenced project generations',
+      'Only for gage R&R studies',
+      'Instead of a control plan',
+      'Only after project closure',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Multi-generation planning sequences ambitious transformations into manageable DMAIC projects with clear Gen 1 focus and later handoffs.',
+  },
+  {
+    id: 'def-007',
+    phase: 'define',
+    topic: 'sipoc',
+    type: 'mcq',
+    difficulty: 'foundation',
+    prompt: 'What does SIPOC stand for?',
+    choices: [
+      'Suppliers, Inputs, Process, Outputs, Customers',
+      'Samples, Intervals, Plots, Outcomes, Controls',
+      'Scope, Issues, People, Outputs, Costs',
+      'Standards, Inputs, Procedures, Operators, Checks',
+    ],
+    correctIndex: 0,
+    explanation:
+      'SIPOC is a high-level process map used early in Define to align on boundaries and customers before deep mapping.',
+  },
+  {
+    id: 'def-008',
+    phase: 'define',
+    topic: 'sipoc',
+    type: 'scenario',
+    difficulty: 'belt',
+    prompt:
+      'The team argues about where the project process starts and ends. Which tool should you facilitate first?',
+    choices: [
+      'SIPOC to agree suppliers/inputs through outputs/customers at a high level',
+      'Full factorial DOE',
+      'Pugh matrix of solutions',
+      'Lean Workout without a problem statement',
+    ],
+    correctIndex: 0,
+    explanation:
+      'SIPOC creates shared process boundaries quickly — a prerequisite for scoped data collection.\n\nDOE and solution selection come much later.',
+    dgqTip: 'Tool-selection scenarios are common: match the symptom to the lightest appropriate tool.',
+  },
+  {
+    id: 'def-009',
+    phase: 'define',
+    topic: 'dependency-assessment',
+    type: 'mcq',
+    difficulty: 'belt',
+    prompt: 'Why perform a dependency assessment in Define?',
+    choices: [
+      'To identify interfaces and external projects that could block or change your scope',
+      'To replace stakeholder management',
+      'To calculate Cp and Cpk',
+      'To design the final control chart',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Dependencies (IT releases, other sites, shared resources, suppliers) create schedule and scope risk if ignored at the Define gate.',
+  },
+  {
+    id: 'def-010',
+    phase: 'define',
+    topic: 'project-management',
+    type: 'mcq',
+    difficulty: 'foundation',
+    prompt: 'In Lean Six Sigma, project management in Define primarily ensures…',
+    choices: [
+      'The right problem is set up for success: scope, team, plan, risks, and governance',
+      'Immediate installation of new machines',
+      'Skipping Measure to save time',
+      'Random tool usage without a roadmap',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Black Belts are project leaders. Method tools only work inside sound project management with sponsor ownership.',
+  },
+  {
+    id: 'def-011',
+    phase: 'define',
+    topic: 'wbs',
+    type: 'mcq',
+    difficulty: 'foundation',
+    prompt: 'A Work Breakdown Structure (WBS) primarily helps you…',
+    choices: [
+      'Decompose project work into manageable work packages',
+      'Plot process capability',
+      'Run a two-sample t-test',
+      'Size a Kanban supermarket',
+    ],
+    correctIndex: 0,
+    explanation:
+      'WBS structures deliverables and tasks so time, resource, and risk planning become concrete.',
+  },
+  {
+    id: 'def-012',
+    phase: 'define',
+    topic: 'network-plan',
+    type: 'mcq',
+    difficulty: 'belt',
+    prompt: 'In a network plan, the critical path is…',
+    choices: [
+      'The longest path of dependent activities that determines minimum project duration',
+      'The cheapest sequence of tasks',
+      'Any path with float greater than two weeks',
+      'The path with the most people assigned',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Delaying a critical-path activity delays the project. Non-critical paths have float.',
+    dgqTip: 'Network plan = schedule logic; Gantt = calendar view; WBS = work packages.',
+  },
+  {
+    id: 'def-013',
+    phase: 'define',
+    topic: 'network-plan',
+    type: 'scenario',
+    difficulty: 'belt',
+    prompt:
+      'Activity A feeds B and C in parallel; D needs both B and C. You must find the shortest feasible duration. Best tool?',
+    choices: [
+      'Network plan / critical path method',
+      'Pareto chart of defect codes',
+      'Histogram of cycle times',
+      'Kano questionnaire only',
+    ],
+    correctIndex: 0,
+    explanation:
+      'A precedence network models dependencies and identifies the critical path that sets minimum project duration.',
+  },
+  {
+    id: 'def-014',
+    phase: 'define',
+    topic: 'time-plan',
+    type: 'mcq',
+    difficulty: 'foundation',
+    prompt: 'A time plan (Gantt-style) in Define is mainly for…',
+    choices: [
+      'Sequencing work packages against a calendar and tracking milestones',
+      'Computing DPMO',
+      'Replacing the problem statement',
+      'Measuring gage bias',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Time plans communicate milestones to sponsors and reveal resource conflicts early.',
+  },
+  {
+    id: 'def-015',
+    phase: 'define',
+    topic: 'resource-planning',
+    type: 'scenario',
+    difficulty: 'belt',
+    prompt:
+      'Subject-matter experts are available only 10% — yet the plan assumes full-time participation. Risk?',
+    choices: [
+      'Schedule slip and shallow analysis — re-plan resources or scope before promising dates',
+      'No risk if the charter looks nice',
+      'Automatically increase Cp',
+      'DOE becomes unnecessary',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Resource realism is part of Define project management. Overcommitted SMEs kill data collection quality.\n\nDocument required effort and escalate to the sponsor for commitment.',
+  },
+  {
+    id: 'def-016',
+    phase: 'define',
+    topic: 'raci',
+    type: 'mcq',
+    difficulty: 'foundation',
+    prompt: 'In a RACI chart, who is “A”?',
+    choices: [
+      'Accountable — the one person ultimately answerable for the outcome',
+      'Assistant — anyone helping casually',
+      'Auditor — external only',
+      'Author — document writer only',
+    ],
+    correctIndex: 0,
+    explanation:
+      'RACI clarifies Responsible, Accountable, Consulted, Informed. Best practice: one Accountable per activity.',
+  },
+  {
+    id: 'def-017',
+    phase: 'define',
+    topic: 'raci',
+    type: 'scenario',
+    difficulty: 'belt',
+    prompt:
+      'Three managers each believe they are the final decision maker for scope changes. Which tool clarifies this?',
+    choices: [
+      'RACI chart with a single Accountable for scope decisions',
+      'Histogram of lead times',
+      'Scatter plot of X vs Y',
+      'SMED externalization worksheet',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Ambiguous accountability fuels conflict. RACI makes decision rights visible — exactly one A.',
+  },
+  {
+    id: 'def-018',
+    phase: 'define',
+    topic: 'budget-planning',
+    type: 'mcq',
+    difficulty: 'belt',
+    prompt: 'Project budget planning should include…',
+    choices: [
+      'Expected costs (people, materials, trials) versus expected benefits over a defined period',
+      'Only the Black Belt’s salary forever',
+      'Sunk costs from unrelated projects',
+      'Nothing quantitative — intuition is enough',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Sponsors approve based on credible cost/benefit. Update assumptions as Measure reveals the true baseline.',
+  },
+  {
+    id: 'def-019',
+    phase: 'define',
+    topic: 'risk-management',
+    type: 'mcq',
+    difficulty: 'belt',
+    prompt: 'A practical early risk approach in Define is to…',
+    choices: [
+      'Identify risks, rate impact/probability, and define mitigation/owners',
+      'Ignore risks until Control',
+      'Treat every risk as equally likely and severe',
+      'Only list risks after the pilot fails',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Risk registers with owners and mitigations are reviewed at gates and updated through the project.',
+  },
+  {
+    id: 'def-020',
+    phase: 'define',
+    topic: 'risk-management',
+    type: 'scenario',
+    difficulty: 'belt',
+    prompt:
+      'IT will replace the measurement system mid-project. Best Define risk response?',
+    choices: [
+      'Log the risk, plan mitigation (parallel validation / freeze window), and review at gates',
+      'Ignore it because Measure starts next week',
+      'Cancel the project immediately without analysis',
+      'Switch to Improve tools to compensate',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Changing the measurement system threatens data continuity and MSA validity. Register, mitigate, and track — do not ignore or jump phases.',
+  },
+  {
+    id: 'def-021',
+    phase: 'define',
+    topic: 'stakeholder-management',
+    type: 'scenario',
+    difficulty: 'belt',
+    prompt:
+      'An influential department head is skeptical and can block data access. Best Define action?',
+    choices: [
+      'Map stakeholders (power/interest), engage early, and plan communication to address concerns',
+      'Exclude them from all meetings to avoid conflict',
+      'Escalate immediately to fire them',
+      'Wait until Improve to introduce the project',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Stakeholder management is proactive. Resistance often stems from unclear WIIFM or fear of blame.\n\nLate surprise at Control often kills sustainment.',
+  },
+  {
+    id: 'def-022',
+    phase: 'define',
+    topic: 'kick-off',
+    type: 'mcq',
+    difficulty: 'foundation',
+    prompt: 'A good project kick-off should achieve…',
+    choices: [
+      'Shared understanding of charter, roles, ground rules, and near-term plan',
+      'Final solution selection',
+      'Signing the control plan',
+      'DOE factor randomization only',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Kick-off launches the team with clarity and energy; it is not an Improve workshop.',
+  },
+  {
+    id: 'def-023',
+    phase: 'define',
+    topic: 'project-communication',
+    type: 'mcq',
+    difficulty: 'foundation',
+    prompt: 'A communication plan typically specifies…',
+    choices: [
+      'Audience, message, channel, frequency, and owner',
+      'Only the email signature font',
+      'ANOVA α levels',
+      'Kanban card colors exclusively',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Structured communication keeps sponsors informed and stakeholders engaged without meeting overload.',
+  },
+  {
+    id: 'def-024',
+    phase: 'define',
+    topic: 'customer-needs',
+    type: 'mcq',
+    difficulty: 'foundation',
+    prompt: 'A Customer Needs Table helps the team…',
+    choices: [
+      'Structure VOC into needs, importance, and measurable requirements',
+      'Plot residuals from regression',
+      'Define pull loop sizes only',
+      'Select fractional factorial generators',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Structured VOC capture prevents designing for loud opinions instead of important needs.',
+  },
+  {
+    id: 'def-025',
+    phase: 'define',
+    topic: 'kano',
+    type: 'mcq',
+    difficulty: 'belt',
+    prompt: 'In the Kano model, “delighters” are features that…',
+    choices: [
+      'Surprise and please when present, but are not expected — their absence may not cause complaints',
+      'Are mandatory legal requirements only',
+      'Always reduce process sigma',
+      'Replace CTQs entirely',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Kano classifies needs as basic, performance, and delighters — useful when translating VOC into priorities.',
+  },
+  {
+    id: 'def-026',
+    phase: 'define',
+    topic: 'kano',
+    type: 'scenario',
+    difficulty: 'master',
+    prompt:
+      'Customers never mention “on-time delivery,” but they angrily churn when late. Kano category?',
+    choices: [
+      'Basic / must-be need — expected when present, causes dissatisfaction when absent',
+      'Delighter only',
+      'Irrelevant reverse quality',
+      'Performance need that scales linearly with marketing spend',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Basic needs are often unspoken until broken. VOC methods must probe dissatisfaction, not only wish lists.',
+  },
+  {
+    id: 'def-027',
+    phase: 'define',
+    topic: 'ctc-ctb',
+    type: 'mcq',
+    difficulty: 'belt',
+    prompt: 'A CTC/CTB matrix is primarily used to…',
+    choices: [
+      'Translate customer/business needs into measurable critical-to-quality / critical-to-business requirements',
+      'Schedule Kanban replenishment',
+      'Replace MSA',
+      'Compute ANOVA tables',
+    ],
+    correctIndex: 0,
+    explanation:
+      'CTC/CTB bridges VOC/VOB to measurable Y’s and requirements that drive the project metric tree.',
+  },
+  {
+    id: 'def-028',
+    phase: 'define',
+    topic: 'gate-define',
+    type: 'scenario',
+    difficulty: 'master',
+    prompt: 'Which set best satisfies a DEFINE gate review?',
+    choices: [
+      'Approved charter, SIPOC/frame, stakeholder & risk view, VOC→CTQ logic, and a plan for Measure',
+      'Pilot results and full rollout checklist',
+      'Only brainstormed causes on sticky notes',
+      'Cp/Cpk after improvement',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Define exit means the problem is framed, sponsored, and ready for trustworthy measurement — not solved yet.',
+    dgqTip: 'Know gate exit criteria cold — they appear as scenario questions.',
+  },
+
+  // ─── MEASURE (27) ──────────────────────────────────────────────────────────,
+
+  // ─── MEASURE (27) ──────────────────────────────────────────────────────────
+  {
+    id: 'mea-001',
+    phase: 'measure',
+    topic: 'collect-data',
+    type: 'mcq',
+    difficulty: 'foundation',
+    prompt: 'The primary purpose of the MEASURE phase is to…',
+    choices: [
+      'Establish a reliable baseline of the process Y and understand current performance',
+      'Implement the final control plan and close the project',
+      'Run full-factorial DOE on all possible Xs',
+      'Rewrite company strategy',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Measure builds a trustworthy picture of today’s Y: definitions, data plan, MSA, sampling, and baseline metrics.\n\nDOE is Analyze/Improve; control plans are Control.',
+  },
+  {
+    id: 'mea-002',
+    phase: 'measure',
+    topic: 'operational-definition',
+    type: 'scenario',
+    difficulty: 'belt',
+    prompt:
+      '“Late order” is defined differently by Sales and Logistics. What should you do before collecting baseline data?',
+    choices: [
+      'Agree and document a single operational definition with examples',
+      'Average both definitions mathematically',
+      'Skip to Improve',
+      'Use only qualitative interviews forever',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Alignment on definitions precedes sampling forms and MSA. Ambiguity destroys MSA and baselines.',
+  },
+  {
+    id: 'mea-003',
+    phase: 'measure',
+    topic: 'data-source',
+    type: 'scenario',
+    difficulty: 'belt',
+    prompt:
+      'Existing ERP data looks convenient but fields are inconsistently filled. Best Measure approach?',
+    choices: [
+      'Assess data quality; if poor, design a focused collection plan rather than trusting garbage data',
+      'Always trust historical data to save time',
+      'Skip baseline entirely',
+      'Use the data only for DOE factor names',
+    ],
+    correctIndex: 0,
+    explanation:
+      'UMS includes testing quality of available data. Bad history beats no history only if you understand its flaws.',
+  },
+  {
+    id: 'mea-004',
+    phase: 'measure',
+    topic: 'data-type',
+    type: 'mcq',
+    difficulty: 'foundation',
+    prompt: 'Cycle time in minutes is which data type?',
+    choices: [
+      'Continuous (variable) data',
+      'Binary discrete only',
+      'Attribute count with only two levels',
+      'Nominal category without order',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Continuous data can take many numeric values. Defective/not defective is discrete/attribute. Data type drives chart and test choice.',
+  },
+  {
+    id: 'mea-005',
+    phase: 'measure',
+    topic: 'sampling',
+    type: 'calc',
+    difficulty: 'belt',
+    prompt:
+      'You estimate a defect rate near 5% and want a rough 95% CI half-width of ±2 percentage points using n ≈ (1.96² × p × (1−p)) / E². Closest n?',
+    choices: [
+      'n ≈ 50',
+      'n ≈ 120',
+      'n ≈ 456',
+      'n ≈ 2,000',
+    ],
+    correctIndex: 2,
+    explanation:
+      'p = 0.05, E = 0.02.\nn ≈ (3.8416 × 0.0475) / 0.0004 ≈ 0.1825 / 0.0004 ≈ 456.\n\nCommon errors: using E = 2 instead of 0.02, or forgetting (1−p).',
+    dgqTip:
+      'Calculator allowed. Attribute baselines often need larger n than continuous studies.',
+  },
+  {
+    id: 'mea-006',
+    phase: 'measure',
+    topic: 'msa',
+    type: 'mcq',
+    difficulty: 'foundation',
+    prompt: 'The purpose of Measurement System Analysis (MSA) is to…',
+    choices: [
+      'Ensure measurement variation is small enough that process data are trustworthy',
+      'Improve the process capability directly by changing X’s',
+      'Replace operational definitions',
+      'Select the final solution',
+    ],
+    correctIndex: 0,
+    explanation:
+      'If the gage is noisy, you cannot see true process variation. MSA before baseline is a Black Belt hallmark.\n\nFor continuous gages use Type II Gage R&R (%GRR / reproducibility); for pass/fail use attribute agreement analysis.',
+    dgqTip: 'MSA before big conclusions — classic exam theme.',
+  },
+  {
+    id: 'mea-007',
+    phase: 'measure',
+    topic: 'gage-rr',
+    type: 'scenario',
+    difficulty: 'master',
+    prompt:
+      'Three inspectors classify 50 parts pass/fail twice each. You need to judge agreement. Which MSA approach fits?',
+    choices: [
+      'Attribute agreement analysis (discrete Gage R&R / kappa-style study)',
+      'Continuous Type II Gage R&R %Study Variation formulas only',
+      'Probability plot of continuous residuals',
+      'Network plan of inspection routes',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Pass/fail classification needs attribute MSA: within-inspector repeatability and between-inspector reproducibility of decisions, often with kappa or percent agreement versus a standard.\n\nContinuous %GRR formulas do not apply directly to binary ratings.',
+  },
+  {
+    id: 'mea-008',
+    phase: 'measure',
+    topic: 'msa-type',
+    type: 'mcq',
+    difficulty: 'belt',
+    prompt: 'MSA Type I studies typically focus on…',
+    choices: [
+      'Bias and repeatability on a reference standard (often Cg/Cgk style assessments)',
+      'Full multi-operator reproducibility only',
+      'Customer Kano interviews',
+      'Pull system sizing',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Type I evaluates the instrument against a known reference (bias/repeatability).\n\nType II Gage R&R adds operators and parts; high %GRR with large reproducibility usually means fix training, fixtures, or criteria before trusting process data.',
+  },
+  {
+    id: 'mea-009',
+    phase: 'measure',
+    topic: 'linearity',
+    type: 'mcq',
+    difficulty: 'belt',
+    prompt: 'A linearity study checks whether…',
+    choices: [
+      'Bias changes across the measurement range',
+      'The process is lean',
+      'Kanban bins are equal',
+      'ANOVA factors are orthogonal',
+    ],
+    correctIndex: 0,
+    explanation:
+      'A gage might be accurate at one size and biased at another. Linearity quantifies that pattern across the operating range.',
+  },
+  {
+    id: 'mea-010',
+    phase: 'measure',
+    topic: 'data-collection-plan',
+    type: 'mcq',
+    difficulty: 'foundation',
+    prompt: 'A data collection plan should define…',
+    choices: [
+      'What, who, when, where, how, sample size, and forms — tied to operational definitions',
+      'Only the final dashboard colors',
+      'Solution brainstorming rules',
+      'Pugh weights',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Good plans prevent messy, biased, incomplete datasets that stall Analyze.',
+  },
+  {
+    id: 'mea-011',
+    phase: 'measure',
+    topic: 'variation',
+    type: 'mcq',
+    difficulty: 'belt',
+    prompt: 'Common cause vs special cause — which statement is correct?',
+    choices: [
+      'Common cause is inherent system noise; special cause is assignable and should be investigated when signals appear',
+      'All variation is special cause',
+      'Common cause means the gage is broken',
+      'Special causes are always desirable',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Reacting to common cause as if it were special (“tampering”) increases variation. Control charts help discriminate.',
+  },
+  {
+    id: 'mea-012',
+    phase: 'measure',
+    topic: 'charts',
+    type: 'scenario',
+    difficulty: 'belt',
+    prompt:
+      'You need to show which defect types contribute most to total defects. Best first chart?',
+    choices: [
+      'Pareto chart',
+      'Normal probability plot only',
+      'Individual value plot of residuals',
+      'Contour plot from RSM',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Pareto prioritizes the vital few categories — a Measure/Analyze workhorse.',
+  },
+  {
+    id: 'mea-013',
+    phase: 'measure',
+    topic: 'charts',
+    type: 'mcq',
+    difficulty: 'foundation',
+    prompt: 'A histogram primarily helps you see…',
+    choices: [
+      'Distribution shape, center, spread, and possible multi-modality',
+      'Cause-and-effect relationships directly',
+      'Critical path float',
+      'RACI roles',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Histograms reveal shape (skew, outliers, multiple peaks) that guide later analysis choices.',
+  },
+  {
+    id: 'mea-014',
+    phase: 'measure',
+    topic: 'charts',
+    type: 'mcq',
+    difficulty: 'belt',
+    prompt: 'A box plot is especially useful to…',
+    choices: [
+      'Compare distribution center/spread/outliers across groups',
+      'Compute DPMO directly',
+      'Build a SIPOC',
+      'Assign RACI roles',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Box plots make group comparisons fast — a stepping stone to stratification and hypothesis tests.',
+  },
+  {
+    id: 'mea-015',
+    phase: 'measure',
+    topic: 'charts',
+    type: 'mcq',
+    difficulty: 'belt',
+    prompt: 'A run chart plots…',
+    choices: [
+      'Data in time order to spot trends, shifts, and patterns',
+      'Only hierarchical cluster trees',
+      'Cost vs benefit scores',
+      'Affinity diagram clusters',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Time order matters. Summaries that ignore time can hide process shifts.',
+  },
+  {
+    id: 'mea-016',
+    phase: 'measure',
+    topic: 'charts',
+    type: 'scenario',
+    difficulty: 'belt',
+    prompt:
+      'You take 5 continuous measurements per hour under a stable sampling plan. Which chart pair fits best?',
+    choices: [
+      'Xbar and R (or S) charts',
+      'p-chart and np-chart only',
+      'c-chart for rare events only',
+      'Gantt chart with control limits',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Subgrouped continuous data commonly use Xbar for the mean and R or S for within-subgroup dispersion.\n\np/np are for proportions; c/u for counts.',
+    dgqTip: 'Tool selection by data type and subgrouping is classic DGQ material.',
+  },
+  {
+    id: 'mea-017',
+    phase: 'measure',
+    topic: 'charts',
+    type: 'mcq',
+    difficulty: 'belt',
+    prompt: 'A scatter plot helps explore…',
+    choices: [
+      'Possible association between two continuous variables',
+      'Time-plan float',
+      'Stakeholder power/interest only',
+      '5S shadow boards',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Scatter plots precede correlation/regression. Always still think carefully about causation.',
+  },
+  {
+    id: 'mea-018',
+    phase: 'measure',
+    topic: 'charts',
+    type: 'mcq',
+    difficulty: 'belt',
+    prompt: 'A normal probability plot is commonly used to…',
+    choices: [
+      'Assess whether data approximately follow a normal distribution',
+      'Calculate project NPV',
+      'Build the SIPOC suppliers column',
+      'Assign Accountable roles in RACI',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Normal probability (QQ) plots help judge normality assumptions for many capability and statistical methods.',
+  },
+  {
+    id: 'mea-019',
+    phase: 'measure',
+    topic: 'location-spread',
+    type: 'calc',
+    difficulty: 'foundation',
+    prompt: 'Data: 10, 12, 12, 14, 50. What are the mean and median?',
+    choices: [
+      'Mean 12, median 14',
+      'Mean 19.6, median 12',
+      'Mean 12, median 12',
+      'Mean 50, median 10',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Mean = (10+12+12+14+50)/5 = 19.6.\nOrdered median (3rd value) = 12.\n\nThe outlier pulls the mean up; the median stays robust.',
+  },
+  {
+    id: 'mea-020',
+    phase: 'measure',
+    topic: 'location-spread',
+    type: 'calc',
+    difficulty: 'belt',
+    prompt:
+      'Sample data 2, 4, 6, 8 (n=4). Using divisor (n−1), what is sample variance s²?',
+    choices: [
+      '5.00',
+      '6.67',
+      '8.00',
+      '20.00',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Mean = 5. Squared deviations sum to 20.\ns² = 20/(4−1) = 20/3 ≈ 6.67.\n\nUsing n in the divisor incorrectly gives 5.00.',
+  },
+  {
+    id: 'mea-021',
+    phase: 'measure',
+    topic: 'process-performance',
+    type: 'calc',
+    difficulty: 'belt',
+    prompt:
+      'A process produces 2,000 units. Each unit has 5 opportunities. You find 40 defects. What is DPMO?',
+    choices: [
+      '4,000',
+      '20,000',
+      '40',
+      '8,000',
+    ],
+    correctIndex: 0,
+    explanation:
+      'DPMO = (defects / (units × opportunities)) × 1,000,000 = (40 / 10,000) × 1e6 = 4,000.\n\nDividing by units only gives ppm defective units — not DPMO.',
+    dgqTip: 'Bring a basic calculator — DPMO/DPU/yield arithmetic is fair game.',
+  },
+  {
+    id: 'mea-022',
+    phase: 'measure',
+    topic: 'process-performance',
+    type: 'calc',
+    difficulty: 'belt',
+    prompt: 'From 40 defects in 2,000 units, what is DPU?',
+    choices: [
+      '0.02',
+      '0.2',
+      '40',
+      '5',
+    ],
+    correctIndex: 0,
+    explanation: 'DPU = defects / units = 40 / 2000 = 0.02.',
+  },
+  {
+    id: 'mea-023',
+    phase: 'measure',
+    topic: 'process-performance',
+    type: 'calc',
+    difficulty: 'belt',
+    prompt:
+      'If DPU = 0.02 and defects occur randomly, approximate rolled throughput yield (e^−DPU) is closest to…',
+    choices: [
+      '98%',
+      '2%',
+      '80%',
+      '50%',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Throughput yield ≈ e^(−DPU) ≈ e^(−0.02) ≈ 0.980 (98%). Useful when linking defects to yield.',
+  },
+  {
+    id: 'mea-024',
+    phase: 'measure',
+    topic: 'process-performance',
+    type: 'calc',
+    difficulty: 'belt',
+    prompt: '50 defectives in 10,000 units. What is ppm defective?',
+    choices: [
+      '5,000 ppm',
+      '50 ppm',
+      '500 ppm',
+      '0.5 ppm',
+    ],
+    correctIndex: 0,
+    explanation: 'ppm = (defectives/units)×1,000,000 = 50/10,000×1e6 = 5,000.',
+  },
+  {
+    id: 'mea-025',
+    phase: 'measure',
+    topic: 'capability',
+    type: 'calc',
+    difficulty: 'belt',
+    prompt:
+      'Specs LSL=10, USL=22. Stable normal process with mean=16 and σ=2. What is Cp?',
+    choices: [
+      '0.50',
+      '1.00',
+      '1.50',
+      '2.00',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Cp = (USL − LSL) / (6σ) = (22 − 10) / (6×2) = 12/12 = 1.00.\n\nCp ignores centering; use Cpk when off-center. Capability indices assume a stable process — check control charts first.',
+  },
+  {
+    id: 'mea-026',
+    phase: 'measure',
+    topic: 'capability',
+    type: 'calc',
+    difficulty: 'master',
+    prompt: 'LSL=100, USL=130, mean=118, σ=4 (stable, normal). What is Cpk?',
+    choices: [
+      'Cpk = 0.75',
+      'Cpk = 1.00',
+      'Cpk = 1.25',
+      'Cpk = 1.50',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Cpu = (130−118)/(3×4) = 12/12 = 1.00.\nCpl = (118−100)/12 = 1.50.\nCpk = min = 1.00.\n\nCp = 30/24 = 1.25 — do not confuse Cp with Cpk. If data are clearly non-normal, consider an appropriate data transformation or non-normal capability methods before quoting Cp/Cpk.',
+    dgqTip: 'Always compute both sides; Cpk is the minimum. Confirm stability (and distribution) first.',
+  },
+  {
+    id: 'mea-027',
+    phase: 'measure',
+    topic: 'gate-measure',
+    type: 'scenario',
+    difficulty: 'master',
+    prompt: 'Which evidence best passes a MEASURE gate?',
+    choices: [
+      'Trusted MSA, clear operational definitions, representative baseline with graphical + metric summary, and readiness for cause analysis',
+      'A list of solutions ranked by popularity',
+      'Only a project logo',
+      'Final audit checklist of the improved process',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Measure exit = we trust the Y and know how bad/big the problem is. Causes and solutions come next.\n\nHigh %GRR or unstable data should hold the gate.',
+    dgqTip:
+      'Pass threshold awareness: do not analyze noise. Fix the measurement system before root-cause work.',
+  }
+];
