@@ -9,12 +9,17 @@ export const challengeStatsQuestions: Question[] = [
     type: 'calc',
     difficulty: 'belt',
     prompt:
-      'Stable normal process: LSL = 50, USL = 80, σ = 5. What is Cp?',
-    choices: ['0.50', '1.00', '1.50', '2.00'],
-    correctIndex: 1,
+      'LSL = 10.0, USL = 16.0, process σ = 1.0, mean μ = 13.0. What is Cp?',
+    choices: [
+      '1.00',
+      '1.33',
+      '2.00',
+      '0.67'
+    ],
+    correctIndex: 0,
     explanation:
-      'Cp = (USL − LSL) / (6σ) = (80 − 50) / (6 × 5) = 30 / 30 = 1.00.\n\nA common error is dividing by 3σ (gives 2.00) or using only one-sided distance from the mean.',
-    dgqTip: 'Cp ignores centering — always pair with Cpk when the mean may be off-target.',
+      'Cp = (USL − LSL) / (6σ) = (16 − 10) / (6 × 1) = 6/6 = 1.00.\n\nCp ignores centering; it only compares tolerance width to process spread.',
+    dgqTip: 'Memorize Cp = tolerance / 6σ. Cpk adds the centering penalty.',
   },
   {
     id: 'chs-002',
@@ -23,12 +28,16 @@ export const challengeStatsQuestions: Question[] = [
     type: 'calc',
     difficulty: 'master',
     prompt:
-      'LSL = 0, USL = 12, mean = 5, σ = 2 (stable, normal). What is Cpk (nearest 0.01)?',
-    choices: ['Cpk = 1.17', 'Cpk = 1.00', 'Cpk = 0.83', 'Cpk = 2.00'],
-    correctIndex: 2,
+      'LSL = 10.0, USL = 16.0, σ = 1.0, μ = 14.0. What is Cpk (rounded to 2 decimals)?',
+    choices: [
+      '2.00',
+      '0.67',
+      '1.00',
+      '1.33'
+    ],
+    correctIndex: 1,
     explanation:
-      'Cpl = (μ − LSL) / (3σ) = (5 − 0) / 6 = 0.833.\nCpu = (USL − μ) / (3σ) = (12 − 5) / 6 = 1.167.\nCpk = min(Cpl, Cpu) = 0.83.\n\nCp = 12 / 12 = 1.00 — do not report Cp when asked for Cpk.',
-    dgqTip: 'Always compute both sides; Cpk is the tighter side.',
+      'Cpu = (USL − μ)/(3σ) = (16 − 14)/3 = 0.667.\nCpl = (μ − LSL)/(3σ) = (14 − 10)/3 = 1.333.\nCpk = min(Cpu, Cpl) ≈ 0.67.\n\nCp would still be 1.00 — the mean sits closer to the USL.',
   },
   {
     id: 'chs-003',
@@ -37,66 +46,70 @@ export const challengeStatsQuestions: Question[] = [
     type: 'scenario',
     difficulty: 'belt',
     prompt:
-      'A process shows Cp = 1.67 but Cpk = 0.72. What is the most appropriate first action?',
+      'A process shows Cp = 1.67 and Cpk = 0.85. What is the most accurate interpretation?',
     choices: [
-      'Recenter the process toward the specification midpoint before buying more precision',
-      'Ignore Cpk because Cp is already excellent',
-      'Widen the specification limits to match the current mean',
-      'Replace the gage — capability indices measure the measurement system',
+      'The process is incapable of meeting specs even if centered',
+      'Cpk > Cp always means over-centering',
+      'Spread is tight enough for the specs, but the process is poorly centered',
+      'The gage is broken; capability cannot be computed'
     ],
-    correctIndex: 0,
+    correctIndex: 2,
     explanation:
-      'High Cp with low Cpk means the process is narrow enough relative to the tolerance but sits too close to one spec. Recentering usually recovers Cpk without capital spend.\n\nWidening specs is a customer/engineering decision, not a substitute for centering.',
+      'High Cp with low Cpk is the classic “recenter first” signal: 6σ fits inside the tolerance, but the mean sits too close to one limit.',
+    dgqTip: 'High Cp + low Cpk ⇒ adjust location before buying precision.',
   },
   {
     id: 'chs-004',
     phase: 'measure',
     topic: 'capability',
-    type: 'mcq',
-    difficulty: 'belt',
+    type: 'calc',
+    difficulty: 'master',
     prompt:
-      'A sponsor asks to “use the USL and LSL as control limits on the X̄ chart.” Why is that wrong?',
+      'USL = 50, LSL = 20, σ = 2.5, μ = 32. Compute Cp and Cpk (2 decimals).',
     choices: [
-      'Control limits must always be ±6σ from the mean',
-      'Specification limits only apply to attribute data',
-      'USL/LSL are used only in DOE, never in Measure',
-      'Control limits come from process variation (voice of the process); specs are customer requirements (voice of the customer)',
+      'Cp = 1.50, Cpk = 1.07',
+      'Cp = 1.20, Cpk = 2.00',
+      'Cp = 2.00, Cpk = 2.40',
+      'Cp = 2.00, Cpk = 1.60'
     ],
     correctIndex: 3,
     explanation:
-      'Shewhart limits describe expected common-cause behavior of the process. Specs describe acceptable product. Mixing them hides special causes and misstates capability.\n\nCapability (Cp/Cpk) compares process to specs — after stability is established with proper control limits.',
-    dgqTip: 'Specs ≠ control limits — a classic Black Belt trap.',
+      'Cp = (50 − 20)/(6 × 2.5) = 30/15 = 2.00.\nCpu = (50 − 32)/(7.5) = 18/7.5 = 2.40.\nCpl = (32 − 20)/7.5 = 12/7.5 = 1.60.\nCpk = 1.60.',
   },
   {
     id: 'chs-005',
     phase: 'measure',
     topic: 'capability',
-    type: 'calc',
-    difficulty: 'master',
-    prompt:
-      'LSL = 20.0, USL = 30.0, σ = 1.0 (stable, normal, centered). What is Cp?',
-    choices: ['0.83', '1.67', '3.00', '10.00'],
-    correctIndex: 1,
+    type: 'mcq',
+    difficulty: 'belt',
+    prompt: 'When is it inappropriate to report Cp/Cpk as a process capability baseline?',
+    choices: [
+      'When the process is statistically unstable (special-cause signals on the control chart)',
+      'Whenever sample size exceeds 30',
+      'Only when the customer uses ppm instead of Cpk',
+      'When Cp equals Cpk'
+    ],
+    correctIndex: 0,
     explanation:
-      'Cp = (30 − 20) / (6 × 1) = 10 / 6 ≈ 1.67.\n\nDividing by σ alone (10) or by 3σ (3.33→rounded wrong) are common arithmetic traps.',
+      'Capability indices assume a predictable, stable process. Unstable processes have no single meaningful “capability” — fix special causes first.',
   },
   {
     id: 'chs-006',
     phase: 'measure',
     topic: 'capability',
-    type: 'mcq',
-    difficulty: 'belt',
+    type: 'calc',
+    difficulty: 'master',
     prompt:
-      'When a stable normal process is perfectly centered between LSL and USL, which statement holds?',
+      'One-sided upper spec only: USL = 100, μ = 88, σ = 4. What is Cpk (here Cpu)?',
     choices: [
-      'Cpk is always twice Cp',
-      'Cp is undefined and only Cpk may be reported',
-      'Cpk equals Cp (both sides are equal)',
-      'Cpk is always zero when centered',
+      '0.50',
+      '1.00',
+      '1.50',
+      '3.00'
     ],
-    correctIndex: 2,
+    correctIndex: 1,
     explanation:
-      'If μ is the midpoint, Cpl = Cpu = (USL − LSL) / (6σ) = Cp, so Cpk = Cp.\n\nOff-center processes make Cpk < Cp.',
+      'With only a USL, Cpk = Cpu = (USL − μ)/(3σ) = (100 − 88)/(12) = 12/12 = 1.00.\n\nThere is no Cpl; do not invent an LSL.',
   },
   {
     id: 'chs-007',
@@ -105,99 +118,107 @@ export const challengeStatsQuestions: Question[] = [
     type: 'scenario',
     difficulty: 'master',
     prompt:
-      'An X̄–R chart shows several points beyond the control limits and a clear mean shift mid-study. The team still publishes Cpk = 1.45. What is the main flaw?',
+      'Short-term within-subgroup σ gives Cp = 1.50. Long-term overall σ gives Pp = 1.05. What does this gap most often indicate?',
     choices: [
-      'Capability indices assume a stable (in-control) process; quoting Cpk on an unstable process is misleading',
-      'Cpk can only be computed from attribute data',
-      'Cpk must always be reported as an integer',
-      'Any Cpk above 1.33 is automatically valid regardless of stability',
+      'MSA is unnecessary for long-term studies',
+      'Pp is always higher than Cp by definition',
+      'Between-subgroup shifts inflate long-term variation relative to short-term potential',
+      'The USL and LSL were swapped'
     ],
-    correctIndex: 0,
+    correctIndex: 2,
     explanation:
-      'Stability first, then capability. Special-cause instability inflates or deflates σ̂ and can make Cpk look better or worse than the steady-state process.\n\nInvestigate and remove assignable causes (or stratify regimes) before claiming capability.',
+      'Cp/Cpk use short-term (within) σ; Pp/Ppk use overall σ. Drift, setup changes, and material lots widen overall σ and drop Pp below Cp.',
   },
   {
     id: 'chs-008',
     phase: 'measure',
     topic: 'capability',
-    type: 'mcq',
-    difficulty: 'master',
+    type: 'calc',
+    difficulty: 'belt',
     prompt:
-      'In many Six Sigma curricula, how do Pp/Ppk conceptually differ from Cp/Cpk?',
+      'Tolerance width = 12, process σ = 1.5. What minimum Cp do you have if the process is perfectly centered?',
     choices: [
-      'Pp/Ppk use only the specification width; Cp/Cpk ignore specs',
-      'Pp/Ppk are for attribute data; Cp/Cpk are for continuous data only',
-      'Pp/Ppk replace MSA and make Gage R&R unnecessary',
-      'Pp/Ppk typically use overall (long-term) variation; Cp/Cpk use within-subgroup (short-term) variation',
+      '2.00',
+      '0.75',
+      '1.00',
+      '1.33'
     ],
     correctIndex: 3,
     explanation:
-      'Cp/Cpk often use short-term σ (e.g. from R̄/d2 within subgroups). Pp/Ppk use the overall sample standard deviation, reflecting long-term performance including shifts.\n\nBoth still require a meaningful distributional basis and trustworthy measurement.',
+      'Cp = 12 / (6 × 1.5) = 12/9 ≈ 1.333. If centered, Cpk = Cp ≈ 1.33.',
   },
   {
     id: 'chs-009',
     phase: 'measure',
     topic: 'capability',
-    type: 'calc',
-    difficulty: 'master',
-    prompt:
-      'LSL = 100, USL = 160, μ = 140, σ = 8. Which side drives Cpk, and what is Cpk?',
+    type: 'mcq',
+    difficulty: 'belt',
+    prompt: 'A customer requires Cpk ≥ 1.33. Which statement is true?',
     choices: [
-      'Lower side; Cpk = 1.67',
-      'Upper side; Cpk = 0.83',
-      'Upper side; Cpk = 1.25',
-      'Lower side; Cpk = 0.83',
+      'At Cpk = 1.33 the nearer spec is about 4σ away from the mean (3 × 1.33)',
+      'Cpk = 1.33 means zero defects forever',
+      'Cpk ignores the mean entirely',
+      'Cpk = 1.33 requires a six-sigma process by definition'
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
-      'Cpl = (140 − 100) / (3 × 8) = 40 / 24 ≈ 1.67.\nCpu = (160 − 140) / 24 = 20 / 24 ≈ 0.83.\nCpk = min = 0.83, driven by the upper side (mean closer to USL).\n\nCp = 60 / 48 = 1.25 — not the answer asked.',
+      'Cpk = (distance to nearer limit)/(3σ). Cpk = 1.33 ⇒ nearer limit ≈ 4σ from the mean. It is not a guarantee of zero defects.',
   },
   {
     id: 'chs-010',
     phase: 'measure',
     topic: 'capability',
     type: 'calc',
-    difficulty: 'belt',
+    difficulty: 'master',
     prompt:
-      'Tolerance width = 18, estimated σ = 2.25. What is Cp?',
-    choices: ['0.75', '1.00', '1.33', '2.25'],
-    correctIndex: 2,
+      'LSL = 0, USL = 10, μ = 5.5, σ = 1.2. Is the process more limited by the upper or lower side, and what is Cpk?',
+    choices: [
+      'Upper side; Cpk ≈ 0.83',
+      'Upper side; Cpk ≈ 1.25',
+      'Lower side; Cpk ≈ 1.53',
+      'Both equal; Cpk ≈ 1.39'
+    ],
+    correctIndex: 1,
     explanation:
-      'Cp = (USL − LSL) / (6σ) = 18 / (6 × 2.25) = 18 / 13.5 = 1.33.\n\nUsing 3σ in the denominator (18/6.75 = 2.67) is a frequent slip.',
+      'Cpu = (10 − 5.5)/(3 × 1.2) = 4.5/3.6 = 1.25.\nCpl = (5.5 − 0)/3.6 ≈ 1.53.\nCpk = 1.25 — limited by the USL.',
   },
   {
     id: 'chs-011',
     phase: 'measure',
     topic: 'capability',
-    type: 'calc',
-    difficulty: 'master',
+    type: 'scenario',
+    difficulty: 'belt',
     prompt:
-      'One-sided upper spec only: USL = 50, μ = 44, σ = 2. What is Cpu (often used as Cpk for unilateral specs)?',
-    choices: ['1.00', '1.50', '3.00', '0.50'],
-    correctIndex: 0,
+      'After a centering move, Cp stays 1.40 while Cpk rises from 0.90 to 1.38. What happened?',
+    choices: [
+      'Specs were widened',
+      'MSA %GRR doubled',
+      'Mean moved toward the middle of the specs; spread was essentially unchanged',
+      'σ was cut in half while the mean stayed put'
+    ],
+    correctIndex: 2,
     explanation:
-      'Cpu = (USL − μ) / (3σ) = (50 − 44) / 6 = 6 / 6 = 1.00.\n\nThere is no LSL, so Cp (two-sided) is not defined the usual way; report the appropriate one-sided index.',
+      'Cp depends only on σ and tolerance. Stable Cp with rising Cpk means the mean moved closer to target without a large σ change.',
   },
   {
     id: 'chs-012',
     phase: 'measure',
     topic: 'capability',
-    type: 'scenario',
-    difficulty: 'belt',
-    prompt:
-      'A Black Belt reports Cpk = 0.55 for a CTQ. What does this imply for a roughly normal process?',
+    type: 'mcq',
+    difficulty: 'master',
+    prompt: 'Why can a normal-assumption Cpk be misleading for heavily skewed cycle-time data?',
     choices: [
-      'Virtually no units will fall outside specs',
-      'The process is centered perfectly; only MSA remains',
-      'Cpk below 1 means the measurement system failed Gage R&R',
-      'Substantial nonconformance is expected — the process spread and/or centering cannot meet the specs',
+      'Cpk formulas require discrete data only',
+      'Skewed data always have Cp = 0',
+      'Skewness invalidates all sampling plans',
+      'Tail probabilities and “% out of spec” from ±3σ formulas do not match the true skewed distribution'
     ],
     correctIndex: 3,
     explanation:
-      'Cpk < 1 means the nearer spec is inside the ±3σ process band, so a non-negligible fraction of output is expected out of spec (exact ppm depends on normality and both sides).\n\nCpk does not diagnose the gage; that is MSA.',
+      'Classical Cp/Cpk interpret distance in σ units under approximate normality. For skewed Y, use transforms, non-normal capability methods, or empirical % defective.',
   },
 
-  // ─── Defect metrics DPU / DPMO / ppm / yield (10 calc) ─────────────────────
+  // ─── DPMO / DPU / ppm / yield / RTY (10) ───────────────────────────────────
   {
     id: 'chs-013',
     phase: 'measure',
@@ -205,12 +226,17 @@ export const challengeStatsQuestions: Question[] = [
     type: 'calc',
     difficulty: 'belt',
     prompt:
-      '5,000 units inspected, 4 opportunities per unit, 60 defects found. What is DPMO?',
-    choices: ['12,000', '3,000', '30,000', '60'],
-    correctIndex: 1,
+      '2,000 units inspected; 5 defect opportunities per unit; 40 defects found. What is DPMO?',
+    choices: [
+      '4,000',
+      '8,000',
+      '20,000',
+      '40,000'
+    ],
+    correctIndex: 0,
     explanation:
-      'DPMO = defects / (units × opportunities) × 1,000,000 = 60 / (5,000 × 4) × 1e6 = 60 / 20,000 × 1e6 = 3,000.\n\nUsing units only: 60/5000×1e6 = 12,000 — that is not DPMO when opportunities > 1.',
-    dgqTip: 'Always multiply units by opportunities in the DPMO denominator.',
+      'Opportunities = 2,000 × 5 = 10,000.\nDPMO = (40 / 10,000) × 1,000,000 = 4,000.',
+    dgqTip: 'DPMO = defects ÷ (units × opportunities) × 10⁶.',
   },
   {
     id: 'chs-014',
@@ -218,37 +244,51 @@ export const challengeStatsQuestions: Question[] = [
     topic: 'process-performance',
     type: 'calc',
     difficulty: 'belt',
-    prompt: '240 defects observed in 8,000 units. What is DPU?',
-    choices: ['0.003', '0.24', '0.03', '3.0'],
-    correctIndex: 2,
-    explanation:
-      'DPU = defects / units = 240 / 8,000 = 0.03.\n\nDo not confuse with DPMO (×1e6 / opportunities) or percent defective.',
+    prompt: '500 units yield 75 defects total. What is DPU?',
+    choices: [
+      '0.075',
+      '0.15',
+      '0.75',
+      '1.50'
+    ],
+    correctIndex: 1,
+    explanation: 'DPU = defects / units = 75 / 500 = 0.15.',
   },
   {
     id: 'chs-015',
     phase: 'measure',
     topic: 'process-performance',
     type: 'calc',
-    difficulty: 'belt',
+    difficulty: 'master',
     prompt:
-      '125 defective units in a lot of 25,000. What is ppm defective?',
-    choices: ['5,000 ppm', '125 ppm', '500 ppm', '20,000 ppm'],
-    correctIndex: 0,
+      'DPU = 0.20. Using the Poisson approximation, what is first-pass yield (e^(−DPU)), nearest percent?',
+    choices: [
+      '67%',
+      '80%',
+      '82%',
+      '98%'
+    ],
+    correctIndex: 2,
     explanation:
-      'ppm defective = (defectives / units) × 1,000,000 = 125 / 25,000 × 1e6 = 5,000.\n\nppm tracks defectives (units), while DPMO tracks defects across opportunities.',
+      'Y ≈ e^(−0.20) ≈ 0.8187 ≈ 82%.\n\nDo not confuse with 1 − DPU = 80% (linear approximation, worse when DPU is not tiny).',
   },
   {
     id: 'chs-016',
     phase: 'measure',
     topic: 'process-performance',
     type: 'calc',
-    difficulty: 'master',
+    difficulty: 'belt',
     prompt:
-      'DPU = 0.05 and defects occur approximately as a Poisson process. Approximate throughput yield e^(−DPU) is closest to…',
-    choices: ['5%', '50%', '90%', '95%'],
+      'Of 25,000 units shipped, 50 are defective. What is the defective rate in ppm?',
+    choices: [
+      '5,000 ppm',
+      '50 ppm',
+      '500 ppm',
+      '2,000 ppm'
+    ],
     correctIndex: 3,
     explanation:
-      'Y ≈ e^(−0.05) ≈ 0.9512 ≈ 95%.\n\nA common mistake is reporting 1 − DPU = 95% as if defects were mutually exclusive on units with at most one defect — that coincides numerically here but the Poisson model is the principled link used in Six Sigma texts.',
+      'ppm = (defectives / units) × 10⁶ = (50 / 25,000) × 1,000,000 = 2,000 ppm.\n\nHere ppm tracks defectives (units), not defect opportunities.',
   },
   {
     id: 'chs-017',
@@ -257,29 +297,34 @@ export const challengeStatsQuestions: Question[] = [
     type: 'calc',
     difficulty: 'master',
     prompt:
-      'A PCB has 12 solder joints (opportunities). In 2,000 boards you find 96 joint defects. What is DPMO?',
-    choices: ['4,000', '48,000', '96', '0.048'],
+      'Three sequential steps have yields 95%, 90%, and 98%. Assuming independence, what is RTY?',
+    choices: [
+      '83.8%',
+      '90.0%',
+      '94.3%',
+      '98.0%'
+    ],
     correctIndex: 0,
     explanation:
-      'Total opportunities = 2,000 × 12 = 24,000.\nDPMO = 96 / 24,000 × 1e6 = 4,000.\n\nDPU = 96/2000 = 0.048 (defects per board), which is not DPMO.',
+      'RTY = 0.95 × 0.90 × 0.98 = 0.8379 ≈ 83.8%.\n\nAverage yield (≈94.3%) overstates end-to-end performance.',
   },
   {
     id: 'chs-018',
     phase: 'measure',
     topic: 'process-performance',
-    type: 'calc',
+    type: 'scenario',
     difficulty: 'belt',
     prompt:
-      'Among 1,000 units there are 40 defectives. Some defectives have multiple defects; total defects = 70. What are DPU and the defective rate?',
+      'A team reports “3.4 DPMO” after counting only final scrap units, ignoring 4 internal rework loops per unit. What is wrong?',
     choices: [
-      'DPU = 0.04; defective rate = 7%',
-      'DPU = 70; defective rate = 40',
-      'DPU = 0.07; defective rate = 4%',
-      'DPU = 0.004; defective rate = 0.7%',
+      'Only RTY matters; DPMO is never used in Measure',
+      'They confused end scrap with opportunity-based defect counting; hidden rework defects are missing from DPMO',
+      'DPMO can never be below 10,000',
+      'Rework improves DPMO by definition so it should be ignored'
     ],
-    correctIndex: 2,
+    correctIndex: 1,
     explanation:
-      'DPU = defects/units = 70/1000 = 0.07.\nDefective rate = defectives/units = 40/1000 = 4%.\n\nDefects and defectives are different counts — swapping them is a classic error.',
+      'Honest DPMO needs a clear opportunity definition and should capture defects generated — including those “fixed” by rework — or the baseline is painted too rosy.',
   },
   {
     id: 'chs-019',
@@ -288,11 +333,16 @@ export const challengeStatsQuestions: Question[] = [
     type: 'calc',
     difficulty: 'master',
     prompt:
-      'Three process steps in series have first-pass yields 0.98, 0.95, and 0.90. What is the rolled throughput yield (RTY)?',
-    choices: ['0.838', '0.943', '2.83', '0.90'],
-    correctIndex: 0,
+      '1,000 units, 3 opportunities each, 15 defects. Also 12 of the 1,000 units are defective. Compare DPMO vs defective ppm.',
+    choices: [
+      'Both equal 15,000',
+      'DPMO = 12,000; defective ppm = 5,000',
+      'DPMO = 5,000; defective ppm = 12,000',
+      'DPMO = 15,000; defective ppm = 5,000'
+    ],
+    correctIndex: 2,
     explanation:
-      'RTY = ∏ FTY_i = 0.98 × 0.95 × 0.90 = 0.8379 ≈ 0.838.\n\nAveraging yields (≈0.943) or taking the minimum (0.90) understates the compounding loss through the chain.',
+      'DPMO = 15/(1,000×3)×10⁶ = 5,000.\nDefective ppm = 12/1,000×10⁶ = 12,000.\n\nDefects ≠ defectives when multiple defects can hit one unit.',
   },
   {
     id: 'chs-020',
@@ -301,40 +351,53 @@ export const challengeStatsQuestions: Question[] = [
     type: 'calc',
     difficulty: 'belt',
     prompt:
-      'DPMO = 2,500 with 5 opportunities per unit. For 10,000 units, how many defects are expected?',
-    choices: ['25', '250', '2,500', '125'],
+      'Step yields: 0.99, 0.99, 0.99, 0.99. What is RTY (nearest 0.1%)?',
+    choices: [
+      '99.0%',
+      '99.6%',
+      '3.96%',
+      '96.1%'
+    ],
     correctIndex: 3,
-    explanation:
-      'DPMO = defects / (units × opp) × 1e6 ⇒ defects = DPMO × units × opp / 1e6\n= 2,500 × 10,000 × 5 / 1,000,000 = 125.\n\nForgetting opportunities yields 25 — a common trap.',
+    explanation: 'RTY = 0.99⁴ ≈ 0.9606 ≈ 96.1%. Four “good” steps still leak ~4%.',
   },
   {
     id: 'chs-021',
     phase: 'measure',
     topic: 'process-performance',
-    type: 'calc',
-    difficulty: 'master',
-    prompt:
-      'A line runs at about 3.4 DPMO (classic “Six Sigma” long-term claim with 1.5σ shift lore). For 1 opportunity per unit, approx. how many defectives per million units?',
-    choices: ['3.4 million', '3.4', '340', '34,000'],
-    correctIndex: 1,
+    type: 'mcq',
+    difficulty: 'belt',
+    prompt: 'Which metric best captures rolled first-pass performance across a multi-step process?',
+    choices: [
+      'RTY (rolled throughput yield)',
+      'Cp alone',
+      'Single-step DPU average',
+      'Control-chart UCL'
+    ],
+    correctIndex: 0,
     explanation:
-      'With one opportunity per unit, DPMO numerically equals ppm defectives: ≈ 3.4 ppm → about 3.4 defectives per million units.\n\nDo not multiply by 1e6 again.',
+      'RTY multiplies step yields (or uses e^(−total DPU) under Poisson assumptions) to show what fraction survives all steps defect-free.',
   },
   {
     id: 'chs-022',
     phase: 'measure',
     topic: 'process-performance',
     type: 'calc',
-    difficulty: 'belt',
+    difficulty: 'master',
     prompt:
-      'From DPU = 0.12, using Y ≈ e^(−DPU), which yield is closest?',
-    choices: ['12%', '88%', '89%', '98%'],
-    correctIndex: 2,
+      'A process has DPU = 0.05. Approximate yield with e^(−DPU). How many defect-free units do you expect from 10,000 starts?',
+    choices: [
+      '9,500',
+      '9,512',
+      '9,000',
+      '9,951'
+    ],
+    correctIndex: 1,
     explanation:
-      'e^(−0.12) ≈ 0.8869 ≈ 89%.\n\n1 − DPU = 88% is a rough linear approximation that understates yield slightly versus the Poisson model when multiple defects per unit are possible.',
+      'Y ≈ e^(−0.05) ≈ 0.9512 → 10,000 × 0.9512 ≈ 9,512 defect-free units.\n\n1 − DPU = 9,500 is the linear shortcut.',
   },
 
-  // ─── Charts: selection & interpretation (12 scenario) ─────────────────────
+  // ─── Chart reading (12) ────────────────────────────────────────────────────
   {
     id: 'chs-023',
     phase: 'measure',
@@ -342,16 +405,16 @@ export const challengeStatsQuestions: Question[] = [
     type: 'scenario',
     difficulty: 'belt',
     prompt:
-      'A Pareto of defect codes shows types A–E at 420, 95, 80, 30, and 25. What is the strongest interpretation?',
+      'A Pareto of 200 defects: Type A 110, B 50, C 25, D 10, E 5. Which action prioritizes the vital few?',
     choices: [
-      'Type A alone is nearly half of all defects — prioritize understanding and attacking A first',
-      'All five types are equally important because five bars appear',
-      'A Pareto proves Type A is the root cause without further data',
-      'You should start with Type E because it is rarest',
+      'Ignore counts and pick the cheapest defect type',
+      'Only plot a histogram of continuous Y',
+      'Attack A and B first (~80% of defects) before spreading effort across C–E',
+      'Start with E because it is rarest'
     ],
-    correctIndex: 0,
+    correctIndex: 2,
     explanation:
-      'Total = 650; A is 420/650 ≈ 65%. Pareto focuses the vital few. It prioritizes categories; it does not by itself prove root cause — that needs Analyze evidence.',
+      'A+B = 160/200 = 80%. Pareto thinking concentrates improvement on the vital few categories.',
   },
   {
     id: 'chs-024',
@@ -360,106 +423,105 @@ export const challengeStatsQuestions: Question[] = [
     type: 'scenario',
     difficulty: 'master',
     prompt:
-      'A histogram of shaft diameter is clearly bimodal with two well-separated peaks. What should you do before quoting a single Cp?',
+      'A histogram of fill weight shows two distinct peaks separated by a gap. Specs sit between them. Best next interpretation?',
     choices: [
-      'Average the two peaks and treat the process as normal',
-      'Widen the bin width until the histogram looks unimodal',
-      'Replace Cp with DPMO only',
-      'Stratify (e.g. by machine/tool/cavity) — a mixture process invalidates a single normal Cp narrative',
+      'The process is perfectly normal',
+      'Delete one peak so Cp improves',
+      'Switch immediately to a c-chart',
+      'Likely mixture of two process settings/lots — stratify before computing a single Cp'
     ],
     correctIndex: 3,
     explanation:
-      'Bimodality usually means two process streams. A pooled σ and one Cp hide that each stream may have different centering and capability.\n\nStratify, then assess each population.',
+      'Bimodality usually means two populations (shifts, tooling, suppliers). A pooled Cp/Cpk is misleading until you stratify.',
   },
   {
     id: 'chs-025',
-    phase: 'measure',
+    phase: 'analyze',
     topic: 'charts',
     type: 'scenario',
     difficulty: 'belt',
     prompt:
-      'Side-by-side box plots for Cycle Time by Shift show Shift B with a much higher median and a long upper whisker/outliers. Best next analytical move?',
+      'Box plots of cycle time by shift show Shift 3 with a much higher median and longer upper whisker. What does this suggest?',
     choices: [
-      'Conclude Shift B is best because the box is taller',
-      'Investigate Shift B’s process conditions — location and upper-tail behavior differ from other shifts',
-      'Ignore box plots; only ANOVA is allowed in Measure',
-      'Merge all shifts before looking at any plot',
+      'Shift 3 tends to run slower with a heavier slow tail — investigate that stratum',
+      'All shifts are identical',
+      'Box plots prove causation from staffing alone',
+      'You must use only pie charts next'
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
-      'Box plots flag differences in center, spread, and outliers across groups — ideal stratification clues before formal tests.\n\nA taller box means more spread, not “better.”',
+      'Box plots compare location and spread across groups. Shift 3’s pattern flags a stratification lead for hypothesis testing.',
   },
   {
     id: 'chs-026',
     phase: 'measure',
     topic: 'charts',
-    type: 'scenario',
+    type: 'mcq',
     difficulty: 'belt',
-    prompt:
-      'A run chart of daily scrap % shows nine consecutive points all above the median, climbing slowly. What does this suggest?',
+    prompt: 'A run chart of daily scrap % shows a sustained step-up after week 6 with no return. Most useful reading?',
     choices: [
-      'Nothing — run charts cannot show patterns',
-      'The process is in perfect statistical control by definition',
-      'A sustained shift/trend upward in scrap — investigate assignable causes in time order',
-      'You must switch immediately to a contour plot',
+      'This proves capability improved',
+      'A process shift likely occurred around week 6 — investigate assignable change',
+      'Noise only; ignore time order',
+      'Run charts cannot show shifts'
     ],
-    correctIndex: 2,
+    correctIndex: 1,
     explanation:
-      'Long runs on one side of the median and gradual climbs are classic non-random signals on a run chart. Time order reveals what averages hide.\n\nFollow up with process knowledge and, when subgrouped, a control chart.',
+      'Time-ordered run charts reveal shifts and trends that summaries hide. A lasting step-up is a classic special-cause candidate.',
   },
   {
     id: 'chs-027',
-    phase: 'measure',
+    phase: 'control',
     topic: 'control-charts',
     type: 'scenario',
     difficulty: 'master',
     prompt:
-      'On an X̄ chart, one point is beyond the upper control limit, then the next subgroups return inside the limits. What is the correct reaction?',
+      'On an Xbar chart, one point exceeds the UCL; the R chart is in control. What does this typically indicate?',
     choices: [
-      'Treat the out-of-limit point as a special-cause signal — investigate that time window even if later points look quiet',
-      'Ignore single points; only trends of eight matter',
-      'Immediately change the specification limits',
-      'Recalculate Cp using only the out-of-control point',
+      'The gage always fails when R is in control',
+      'Ignore Xbar if R is quiet',
+      'A mean-level special cause (shift in location) while within-subgroup dispersion looks stable',
+      'The process σ exploded while the mean stayed fixed'
     ],
-    correctIndex: 0,
+    correctIndex: 2,
     explanation:
-      'A point beyond control limits is a primary Shewhart signal. Later in-control points do not erase the need to investigate the assignable cause for that subgroup.\n\nWestern Electric / Nelson rules add other patterns, but UCL/LCL breaches stand alone.',
+      'Xbar monitors subgroup means; R (or S) monitors within-subgroup variation. An Xbar signal with quiet R points to a location shift.',
   },
   {
     id: 'chs-028',
-    phase: 'measure',
+    phase: 'control',
     topic: 'control-charts',
-    type: 'scenario',
+    type: 'mcq',
     difficulty: 'belt',
-    prompt:
-      'Operators redraw control limits every week using last week’s max and min observed values “so the chart always looks green.” What is wrong?',
+    prompt: 'Control limits on a Shewhart chart are primarily based on…',
     choices: [
-      'Control limits should be redrawn every hour, not weekly',
-      'Green charts are forbidden in DGQ projects',
-      'Max/min limits are preferred for attribute charts only',
-      'Limits should be based on a stable baseline estimate of common-cause σ — constantly refitting to recent extremes masks signals',
+      'Customer USL/LSL exclusively',
+      'Management stretch goals',
+      'The project budget line',
+      'Process variation (typically ±3σ of the plotted statistic), not the customer specs'
     ],
     correctIndex: 3,
     explanation:
-      'Adapting limits to whatever just happened converts the chart into a tautology. Proper limits come from a representative in-control period (or carefully justified updates after a real process change).',
+      'Control limits describe voice of the process. Spec limits are voice of the customer. Do not confuse the two.',
+    dgqTip: 'Control ≠ capability: UCL/LCL ≠ USL/LSL.',
   },
   {
     id: 'chs-029',
-    phase: 'measure',
+    phase: 'analyze',
     topic: 'charts',
     type: 'scenario',
     difficulty: 'belt',
     prompt:
-      'A scatter plot of Temperature (X) vs Yield (Y) shows points rising then falling in a clear curve. Correlation r is near zero. What is the lesson?',
+      'A scatter plot of temperature (X) vs yield (Y) shows a clear upward cloud with no obvious outliers. Reasonable next step?',
     choices: [
-      'r ≈ 0 proves there is no relationship of any kind',
-      'Linear correlation can miss strong nonlinear association — plot first; consider transforms or quadratic terms',
-      'Scatter plots are invalid when r is computed',
-      'You should use a Pareto chart instead of a scatter for two continuous variables',
+      'Quantify association (correlation/regression) and then test causation carefully',
+      'Declare temperature the only root cause with no further work',
+      'Switch to a Pareto of temperatures',
+      'Delete the X axis because correlation is banned'
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
-      'Pearson r measures linear association. Curved relationships can average to near-zero r. Always look at the scatter before trusting a single correlation number.',
+      'Scatter plots motivate correlation/regression. Association ≠ proven causation — still need process knowledge and designed tests.',
   },
   {
     id: 'chs-030',
@@ -468,235 +530,229 @@ export const challengeStatsQuestions: Question[] = [
     type: 'scenario',
     difficulty: 'master',
     prompt:
-      'A normal probability plot of residuals bends systematically in the tails (S-shape). Capability software still prints Cp assuming normality. Risk?',
+      'A normal probability plot of residuals bends systematically in both tails. What should you question?',
     choices: [
-      'None — probability plots are only for DOE',
-      'S-shapes always mean the gage failed',
-      'Normal-based Cp/Cpk and ppm projections may be wrong — consider transformation or non-normal capability methods',
-      'You should replace the probability plot with a Gantt chart',
+      'Whether takt time equals cycle time',
+      'The normality assumption for methods that require it (many classical capability/CI procedures)',
+      'Whether SIPOC suppliers were listed',
+      'Whether RACI has enough Cs'
     ],
-    correctIndex: 2,
+    correctIndex: 1,
     explanation:
-      'Probability plots check the normality assumption behind many capability calculations. Systematic curvature warns that tail probabilities (and thus implied ppm) can be badly misestimated.',
+      'Curved probability plots signal non-normality. Consider transforms, nonparametric methods, or distribution-specific capability.',
   },
   {
     id: 'chs-031',
     phase: 'measure',
     topic: 'charts',
-    type: 'scenario',
+    type: 'mcq',
     difficulty: 'belt',
-    prompt:
-      'You need the right chart for counts of scratches per painted panel (area roughly constant). Which fits best?',
+    prompt: 'Which chart is best to compare defect counts by category for prioritization?',
     choices: [
-      'c-chart (or u-chart if area/opportunity varies)',
-      'X̄–R chart of continuous scratch length only',
-      'np-chart of continuous diameters',
-      'PERT network of scratch locations',
+      'Normal probability plot',
+      'Gantt chart',
+      'Pareto chart',
+      'I-MR chart of a continuous Y only'
     ],
-    correctIndex: 0,
-    explanation:
-      'Defect counts per unit with roughly equal opportunity → c-chart; unequal opportunity → u-chart.\n\nX̄–R needs continuous subgrouped measurements; np needs defectives with fixed n.',
-    dgqTip: 'Match chart family to data type: continuous / proportion / count.',
+    correctIndex: 2,
+    explanation: 'Pareto ranks categorical contributors. Probability plots and I-MR serve continuous distribution/stability questions.',
   },
   {
     id: 'chs-032',
-    phase: 'measure',
+    phase: 'control',
     topic: 'control-charts',
     type: 'scenario',
     difficulty: 'master',
     prompt:
-      'Daily lot size varies from 80 to 400 units. You track fraction defective each day. Best chart?',
+      'Western Electric: 2 of 3 consecutive points beyond 2σ on the same side of the centerline, none beyond 3σ. Correct reaction?',
     choices: [
-      'X̄ chart with n = 5 always',
-      'c-chart ignoring sample size',
-      'Individuals chart of the raw defective count only',
-      'p-chart (or Laney p′ if overdispersion) with varying n',
+      'Ignore because nothing crossed 3σ',
+      'Widen specs to absorb the pattern',
+      'Recalculate Cp immediately and close the project',
+      'Treat as a special-cause signal and investigate — do not wait for a point outside 3σ'
     ],
     correctIndex: 3,
     explanation:
-      'Proportion defective with unequal sample sizes → p-chart (control limits widen/narrow with n). A plain c-chart on counts ignores unequal opportunity from lot size.',
+      'Supplemental run rules catch non-random patterns earlier than a single 3σ breach. Investigate assignable causes.',
   },
   {
     id: 'chs-033',
     phase: 'measure',
-    topic: 'variation',
+    topic: 'charts',
     type: 'scenario',
     difficulty: 'belt',
     prompt:
-      'A control chart is in control, yet scrap is still too high versus the business goal. What does that mean?',
+      'Histogram looks roughly bell-shaped and centered in specs, but the run chart shows a strong upward trend. What is the risk?',
     choices: [
-      'In-control processes cannot have scrap',
-      'The process is stable but its common-cause level may still be incapable — need process improvement, not only firefighting points',
-      'Special causes must still be present if scrap exists',
-      'You should stop using control charts in Measure',
+      'Time-blind summaries hide an unstable, drifting process that will soon breach specs',
+      'Histograms always override run charts',
+      'Trends prove the process is capable',
+      'No risk if the histogram looks nice'
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
-      'Stability ≠ capability. An in-control process can sit at an unacceptable average defect level. Further gains require changing the system (Improve/DOE), not chasing phantom special causes.',
+      'Always pair distributional views with time order. A pretty histogram of a trending process is a trap.',
   },
   {
     id: 'chs-034',
     phase: 'analyze',
-    topic: 'stratification',
-    type: 'scenario',
+    topic: 'charts',
+    type: 'mcq',
     difficulty: 'belt',
-    prompt:
-      'Overall defect rate looks flat, but stratified run charts by Supplier show Supplier C spiking while A and B are flat. Best conclusion?',
+    prompt: 'A box plot flags points beyond the whiskers. What do those points represent in the usual construction?',
     choices: [
-      'Stratification is unnecessary once the overall chart is flat',
-      'Supplier C cannot matter because the overall average is stable',
-      'Hidden supplier differences exist — analyze and act on Supplier C while monitoring A/B separately',
-      'Only a two-way ANOVA is allowed; charts are obsolete',
+      'Points that must be deleted to raise Cpk',
+      'Observations beyond a multiple of the IQR from the quartiles — candidates for investigation, not automatic deletes',
+      'Proof of special causes on a control chart',
+      'Mandatory MSA failures'
     ],
-    correctIndex: 2,
+    correctIndex: 1,
     explanation:
-      'Aggregation can cancel opposing or localized signals. Stratification by supplier (or shift, product, site) is often the highest-ROI Analyze step before formal modeling.',
+      'Box-plot “outliers” are exploratory flags. Confirm with process knowledge and appropriate charts before discarding data.',
   },
 
-  // ─── Statistics: CI, tests, ANOVA, regression, DOE (15) ────────────────────
+  // ─── Hypothesis / CI / ANOVA / regression / DOE (14) ───────────────────────
   {
     id: 'chs-035',
     phase: 'analyze',
-    topic: 'confidence-interval',
-    type: 'mcq',
+    topic: 'hypothesis',
+    type: 'scenario',
     difficulty: 'belt',
     prompt:
-      'A 95% CI for mean cycle time is [12.1, 13.4] seconds. Correct interpretation?',
+      'Two-sample t-test of means: p = 0.03 at α = 0.05. Practical difference is 0.2 seconds on a 120-second cycle. Best conclusion?',
     choices: [
-      'The procedure that produced this interval covers the true mean in about 95% of repeated samples; this realized interval either covers μ or it does not',
-      '95% of individual units fall between 12.1 and 13.4',
-      'The true mean is guaranteed to be exactly 12.75',
-      'There is a 95% chance the next observation is inside the interval',
+      'Reject the data because p is not zero',
+      'Accept H₀ because the cycle is long',
+      'Statistically significant at 5%, but judge practical importance separately — the effect may be tiny',
+      'p < 0.05 proves the change is always business-critical'
     ],
-    correctIndex: 0,
+    correctIndex: 2,
     explanation:
-      'A CI is about the parameter, not a prediction interval for one unit. After the sample is drawn, coverage is a property of the method, not a posterior probability that μ “lives” randomly in the interval.',
+      'Statistical significance ≠ practical significance. Report effect size and business impact alongside the p-value.',
   },
   {
     id: 'chs-036',
     phase: 'analyze',
     topic: 'hypothesis',
     type: 'mcq',
-    difficulty: 'belt',
-    prompt:
-      'You test H0: μ = 100 at α = 0.05 and obtain p = 0.03. What follows?',
+    difficulty: 'master',
+    prompt: 'Failing to reject H₀ when a real difference exists is…',
     choices: [
-      'Fail to reject H0 because p is small',
-      'Accept H0 as proven true',
-      'Reject H0 at α = 0.05 — evidence against the null is strong enough under this risk threshold',
-      'The Type II error rate is exactly 0.03',
+      'A Type I error (α)',
+      'Always caused by α = 0.01',
+      'Impossible if n > 30',
+      'A Type II error (β); power = 1 − β'
     ],
-    correctIndex: 2,
+    correctIndex: 3,
     explanation:
-      'Decision rule: reject H0 when p ≤ α. p = 0.03 ≤ 0.05 → reject. That does not quantify practical importance; check effect size and process impact.\n\np is not β (Type II).',
+      'Type I: false alarm (reject true H₀). Type II: miss (fail to reject false H₀). Power rises with larger effects, larger n, and lower noise.',
   },
   {
     id: 'chs-037',
     phase: 'analyze',
-    topic: 'hypothesis',
-    type: 'mcq',
-    difficulty: 'master',
+    topic: 'confidence-interval',
+    type: 'scenario',
+    difficulty: 'belt',
     prompt:
-      'In hypothesis testing, what is a Type II error?',
+      'A 95% CI for the mean defect rate is [2.1%, 2.9%]. The target is 2.0%. Correct reading?',
     choices: [
-      'Rejecting H0 when H0 is true (false alarm)',
-      'Failing to reject H0 when H0 is false (missed detection)',
-      'Choosing α = 0.05',
-      'Using a two-sided instead of one-sided test',
+      'The interval does not include 2.0%, so data are inconsistent with a mean of 2.0% at this confidence level',
+      '95% of individual units fall between 2.1% and 2.9%',
+      'The true mean is exactly 2.5%',
+      'CI width is unrelated to sample size'
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
-      'Type I (α): false alarm — reject a true H0.\nType II (β): miss — fail to reject a false H0.\nPower = 1 − β.\n\nConfusing α with β is a frequent exam error.',
+      'A CI for the mean estimates where the mean likely sits. It is not a prediction interval for individuals. Here 2.0% lies outside the interval.',
   },
   {
     id: 'chs-038',
     phase: 'analyze',
-    topic: 'anova',
-    type: 'scenario',
-    difficulty: 'belt',
+    topic: 'confidence-interval',
+    type: 'calc',
+    difficulty: 'master',
     prompt:
-      'You compare mean strength across four resin suppliers with roughly normal, equal-variance data. Which analysis fits?',
+      'n = 100, sample mean = 50, known σ = 10. Approximate 95% CI for μ using z ≈ 1.96 (round to 1 decimal).',
     choices: [
-      'Paired t-test of supplier 1 vs 4 only, ignoring 2 and 3',
-      'Simple linear regression with binary Y',
-      'c-chart of resin batch codes',
-      'One-way ANOVA (then multiple comparisons if significant)',
+      '[30.4, 69.6]',
+      '[48.0, 52.0]',
+      '[40.0, 60.0]',
+      '[49.0, 51.0]'
     ],
-    correctIndex: 3,
+    correctIndex: 1,
     explanation:
-      'One-way ANOVA tests equality of means across 3+ levels of a single factor. Pairwise cherry-picking without multiplicity control misleads.\n\nTwo-way ANOVA adds a second factor and possible interaction.',
+      'SE = σ/√n = 10/10 = 1.\nMargin ≈ 1.96 × 1 ≈ 1.96 → CI ≈ [48.0, 52.0].',
   },
   {
     id: 'chs-039',
     phase: 'analyze',
     topic: 'anova',
     type: 'scenario',
-    difficulty: 'master',
+    difficulty: 'belt',
     prompt:
-      'In a two-way ANOVA, Factor A and Factor B main effects look small, but the A×B interaction is highly significant. What does that mean?',
+      'One-way ANOVA across 4 machines: p = 0.01. What is a sound next step?',
     choices: [
-      'The effect of A on Y depends on the level of B (and vice versa) — interpret interaction plots, not main effects alone',
-      'Interaction significant means the data are invalid',
-      'You should average A and B and ignore the interaction term',
-      'Main effects are always more important than interactions',
+      'Pool all machines forever without checking',
+      'Switch to a pie chart as proof',
+      'Conclude at least one machine mean differs; use multiple comparisons / process knowledge to find which',
+      'Stop — ANOVA already names the best machine'
     ],
-    correctIndex: 0,
+    correctIndex: 2,
     explanation:
-      'A significant interaction means factors do not act additively. Optimal settings for A change with B. Report and plot the interaction; do not rely on main-effect averages alone.',
+      'ANOVA signals that not all means are equal. Pairwise or planned contrasts (with multiplicity control) identify where differences lie.',
   },
   {
     id: 'chs-040',
     phase: 'analyze',
-    topic: 'regression',
+    topic: 'anova',
     type: 'mcq',
-    difficulty: 'belt',
-    prompt:
-      'Ice cream sales and drowning incidents correlate strongly over months. Best statement?',
+    difficulty: 'master',
+    prompt: 'Two-way ANOVA with interaction: the A×B interaction is significant. What does that mean?',
     choices: [
-      'Ice cream sales cause drownings',
-      'Correlation coefficients prove causation when |r| > 0.9',
-      'Association can be driven by a lurking variable (e.g. hot weather / season) — correlation ≠ causation',
-      'You must never compute correlation for seasonal data',
+      'A and B are always independent of Y',
+      'Main effects can be interpreted in isolation without plots',
+      'The experiment failed and must be discarded',
+      'The effect of A on Y depends on the level of B (and vice versa)'
     ],
-    correctIndex: 2,
+    correctIndex: 3,
     explanation:
-      'Observational correlation does not establish cause. Confounders and common causes can induce association. Causal claims need design (DOE, randomization) or strong causal inference methods plus process knowledge.',
+      'Interaction means factor effects are not additive. Interpret with interaction plots; be careful summarizing main effects alone.',
   },
   {
     id: 'chs-041',
     phase: 'analyze',
     topic: 'regression',
-    type: 'mcq',
+    type: 'scenario',
     difficulty: 'belt',
     prompt:
-      'A simple linear regression of Y on X has R² = 0.64. Correct reading?',
+      'Simple linear regression: R² = 0.81, residual plots show a clear curve. Best action?',
     choices: [
-      '64% of data points lie exactly on the fitted line',
-      'About 64% of the variance in Y is accounted for by the linear relationship with X',
-      'The slope equals 0.64',
-      'p-value must be 0.64',
+      'Do not trust the linear fit — consider a nonlinear term or transform despite high R²',
+      'High R² always validates linearity',
+      'Delete residuals to raise R² further',
+      'Conclude causation from R² alone'
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
-      'R² is the proportion of response variance explained by the model. It is not the slope, not a p-value, and not the percent of points on the line.',
+      'R² measures fit, not assumption validity. Curved residuals mean the linear model is misspecified.',
   },
   {
     id: 'chs-042',
     phase: 'analyze',
     topic: 'regression',
-    type: 'scenario',
+    type: 'calc',
     difficulty: 'master',
     prompt:
-      'In a multiple regression, coefficient of Pressure is +2.5 (p = 0.01) holding other Xs fixed. Practical reading?',
+      'Fitted model Ŷ = 10 + 2X. At X = 7, what is the predicted Y? If observed Y = 20, what is the residual?',
     choices: [
-      'Pressure is unrelated to Y because other Xs exist',
-      'Every variable in the model causes Y',
-      'R² must equal 2.5',
-      'A one-unit increase in Pressure is associated with a 2.5-unit increase in predicted Y, adjusting for the other predictors — still check units, collinearity, and causation',
+      'Ŷ = 14; residual = 6',
+      'Ŷ = 24; residual = −4',
+      'Ŷ = 17; residual = 3',
+      'Ŷ = 24; residual = 4'
     ],
-    correctIndex: 3,
+    correctIndex: 1,
     explanation:
-      'Partial coefficients are ceteris-paribus associations under the model. Statistical significance ≠ causation; also inspect VIF/collinearity and residual assumptions.',
+      'Ŷ = 10 + 2×7 = 24.\nResidual = Y − Ŷ = 20 − 24 = −4.',
   },
   {
     id: 'chs-043',
@@ -704,30 +760,32 @@ export const challengeStatsQuestions: Question[] = [
     topic: 'regression',
     type: 'mcq',
     difficulty: 'belt',
-    prompt:
-      'Y is pass/fail (binary). Which modeling approach is most appropriate?',
+    prompt: 'Correlation r = −0.92 between X and Y means…',
     choices: [
-      'Logistic regression (models log-odds of pass/fail)',
-      'Ordinary least squares with no link, forcing predictions into [0,1] by clipping only',
-      'X̄–R chart of the binary codes 0/1 as if continuous capability',
-      'One-way ANOVA treating fail as a continuous strength',
+      'No linear relationship',
+      'The process is out of control',
+      'A strong inverse linear association — not automatically that X causes Y',
+      'X causes Y with 92% probability'
     ],
-    correctIndex: 0,
+    correctIndex: 2,
     explanation:
-      'Logistic regression is the standard for binary outcomes. Linear probability models can predict outside [0,1] and mishandle variance.\n\nControl charts for defectives use p/np — different purpose than modeling Xs.',
+      'Large |r| indicates strong linear association. Causation needs theory, time order, and preferably designed experiments.',
   },
   {
     id: 'chs-044',
     phase: 'analyze',
     topic: 'doe',
-    type: 'calc',
+    type: 'mcq',
     difficulty: 'belt',
-    prompt:
-      'How many unique factor-level combinations does a full factorial 2^5 design require (one replicate, no center points)?',
-    choices: ['10', '32', '25', '16'],
-    correctIndex: 1,
-    explanation:
-      '2^k full factorial → 2^5 = 32 runs for one replicate.\n\n2×5 = 10 confuses OFAT thinking; 2^4 = 16 is one factor short.',
+    prompt: 'A full factorial 2³ design has how many unique factor-level combinations (before replicates)?',
+    choices: [
+      '9',
+      '16',
+      '6',
+      '8'
+    ],
+    correctIndex: 3,
+    explanation: '2³ = 8 corner points. Each added factor doubles the factorial points.',
   },
   {
     id: 'chs-045',
@@ -736,16 +794,17 @@ export const challengeStatsQuestions: Question[] = [
     type: 'scenario',
     difficulty: 'master',
     prompt:
-      'You have 11 suspected continuous factors and a tight run budget. Goal: find the vital few, not yet optimize curvature. Best first design family?',
+      'You need to screen 7 factors with a limited budget. Which DOE approach fits first?',
     choices: [
-      'Response surface CCD with all 11 factors immediately',
-      'Full 2^11 factorial in one go',
-      'Fractional factorial (or similar screening design), then follow up on active factors',
-      'One-factor-at-a-time with 2 runs per factor only',
+      'A fractional factorial (or similar screening design) to find vital few, then follow up',
+      'A full 2⁷ with 10 replicates immediately',
+      'Only one-factor-at-a-time forever',
+      'Skip DOE and adjust all knobs at once on the line'
     ],
-    correctIndex: 2,
+    correctIndex: 0,
     explanation:
-      'Screen many factors with fractionals / Plackett–Burman-type designs despite aliasing; confirm and then optimize (RSM) once the active set is small.\n\nFull 2^11 = 2048 runs is usually impractical; RSM too early wastes effort on inactive factors.',
+      'Screening designs efficiently separate vital factors from noise. Confirm and optimize with follow-on designs (RSM, fuller factorials).',
+    dgqTip: 'Screen → characterize → optimize is the usual DOE path.',
   },
   {
     id: 'chs-046',
@@ -753,182 +812,177 @@ export const challengeStatsQuestions: Question[] = [
     topic: 'doe',
     type: 'mcq',
     difficulty: 'master',
-    prompt:
-      'A 2^(5−1) fractional factorial has how many runs (one replicate), and what is the usual tradeoff?',
+    prompt: 'In a 2^(k−p) fractional factorial, aliasing means…',
     choices: [
-      '16 runs; some effects are aliased (resolution tradeoff vs a full 32-run design)',
-      '5 runs; no aliasing ever occurs in fractions',
-      '32 runs; identical to the full factorial',
-      '10 runs; OFAT with two levels',
+      'Center points are forbidden',
+      'Some effects are confounded — you cannot separately estimate aliased terms without more runs',
+      'All interactions are always zero',
+      'Randomization is unnecessary'
     ],
-    correctIndex: 0,
+    correctIndex: 1,
     explanation:
-      '2^(5−1) = 16 runs. Half-fractions alias effects (e.g. main effects with higher-order interactions depending on generators/resolution).\n\nYou buy fewer runs at the cost of confounding structure you must manage.',
+      'Fractionation saves runs but aliases effects. Resolution and follow-up de-aliasing matter for correct conclusions.',
   },
   {
     id: 'chs-047',
-    phase: 'analyze',
-    topic: 'confidence-interval',
-    type: 'mcq',
-    difficulty: 'belt',
-    prompt:
-      'Other things equal, what happens to a CI for the mean when sample size n increases?',
-    choices: [
-      'The interval always becomes wider',
-      'α automatically becomes zero',
-      'The sample mean must move to the true mean after one extra point',
-      'The interval tends to become narrower (standard error shrinks like 1/√n)',
-    ],
-    correctIndex: 3,
-    explanation:
-      'SE(μ̂) ≈ s/√n, so larger n tightens CIs (for fixed confidence level and variability). Width also depends on confidence level and σ.',
-  },
-  {
-    id: 'chs-048',
     phase: 'analyze',
     topic: 'hypothesis',
     type: 'scenario',
     difficulty: 'master',
     prompt:
-      'A test of process A vs B yields p = 0.40 at α = 0.05. The team says “we proved A and B are identical.” Critique?',
+      'Before comparing two process means with a t-test, %GRR is 48% of process variation. What should you do?',
     choices: [
-      'Correct — large p always proves exact equality',
-      'Incorrect — failure to reject H0 is not proof of equality; the study may be underpowered or the effect small relative to noise',
-      'Incorrect only because α should have been 0.40',
-      'Correct if and only if R² > 0.9',
-    ],
-    correctIndex: 1,
-    explanation:
-      '“Nonsignificant” ≠ “equal.” Consider power, confidence intervals for the difference, and practical tolerances. Absence of evidence is not evidence of absence.',
-  },
-  {
-    id: 'chs-049',
-    phase: 'analyze',
-    topic: 'stratification',
-    type: 'scenario',
-    difficulty: 'belt',
-    prompt:
-      'Before running a complex multiple regression on cycle time, a Belt slices data by product family and sees one family drives almost all long times. Best practice?',
-    choices: [
-      'Ignore the slice — modeling all data together is always better',
-      'Delete the slow family from the dataset without comment',
-      'Let stratification guide scope: analyze that family separately (or include family as a factor) rather than burying the structure in one pooled model',
-      'Replace all analysis with a single pie chart',
+      'Widen α to 0.20 to compensate',
+      'Replace the t-test with ANOVA of the same noisy data',
+      'Fix the measurement system first — high measurement noise can mask or invent process differences',
+      'Run a larger t-test sample and ignore MSA'
     ],
     correctIndex: 2,
     explanation:
-      'Stratification often reveals the real problem structure. Pooling heterogeneous families can produce misleading coefficients and hide the actionable segment.',
+      'MSA is a gate before statistical inference. Loud gages inflate error variance and corrupt hypothesis tests and capability.',
+  },
+  {
+    id: 'chs-048',
+    phase: 'analyze',
+    topic: 'variation',
+    type: 'mcq',
+    difficulty: 'belt',
+    prompt: 'Tampering (reacting to common-cause noise as if it were special) typically…',
+    choices: [
+      'Always reduces σ to zero',
+      'Has no effect on control charts',
+      'Converts Cp into Pp automatically',
+      'Increases process variation over time'
+    ],
+    correctIndex: 3,
+    explanation:
+      'Deming’s funnel experiment: chasing noise adds variation. Use control-chart logic to decide when to act.',
   },
 
-  // ─── MSA edge cases (6) ────────────────────────────────────────────────────
+  // ─── MSA gates before stats (7) ────────────────────────────────────────────
   {
-    id: 'chs-050',
+    id: 'chs-049',
     phase: 'measure',
-    topic: 'gage-rr',
+    topic: 'msa',
     type: 'scenario',
-    difficulty: 'master',
+    difficulty: 'belt',
     prompt:
-      '%Study Variation from Gage R&R is 48%. The team wants to publish Cpk = 1.8 from the same gage. What should happen first?',
+      'A Belt wants baseline Cp before any Gage R&R. Sponsor asks for speed. Correct coaching?',
     choices: [
-      'Improve the measurement system — nearly half the observed study variation is measurement noise, so capability numbers are not trustworthy yet',
-      'Publish Cpk anyway; MSA is optional after Define',
-      'Increase %GRR further to make Cpk larger',
-      'Switch to attribute MSA formulas for continuous data',
+      'Pause capability claims until MSA shows the gage is adequate — otherwise numbers may be fiction',
+      'Cp does not use measurements, so MSA is optional',
+      'Always compute Cp first; MSA only in Control',
+      'Skip MSA if n > 100'
     ],
     correctIndex: 0,
     explanation:
-      'High GRR means observed process σ is contaminated by measurement error. Capability and hypothesis tests on such data mislead.\n\nGuidelines often treat %SV ≳ 30% as unacceptable / needs improvement (context-dependent), and ~10% as desirable.',
-    dgqTip: 'MSA before big statistical conclusions — classic DGQ theme.',
+      'Measure-gate discipline: operational definition → MSA → then baseline capability/DPMO. Bad gages fake good or bad processes.',
+    dgqTip: 'MSA before big conclusions — classic DGQ theme.',
+  },
+  {
+    id: 'chs-050',
+    phase: 'measure',
+    topic: 'msa',
+    type: 'mcq',
+    difficulty: 'master',
+    prompt: 'Type II Gage R&R %Study Variation = 32%. Common rule-of-thumb assessment?',
+    choices: [
+      'Proof the process Cpk is 1.33',
+      'Marginal — investigate and improve; not a comfortable “green” system',
+      'Excellent; ignore operators entirely',
+      'Impossible; %GRR cannot exceed 30%'
+    ],
+    correctIndex: 1,
+    explanation:
+      'Common AIAG-style bands: under ~10% good, ~10–30% marginal/conditional, over ~30% unacceptable for many uses. 32% needs improvement.',
   },
   {
     id: 'chs-051',
     phase: 'measure',
     topic: 'msa',
     type: 'scenario',
-    difficulty: 'master',
+    difficulty: 'belt',
     prompt:
-      'A linearity study shows bias near zero at mid-range but increasingly negative bias toward the high end of the measuring range. Implication?',
+      'Attribute MSA: inspectors disagree on borderline parts versus the master standard. Process data will be pass/fail scrap rates. Risk?',
     choices: [
-      'Linearity is perfect because mid-range bias is zero',
-      'You can ignore bias if repeatability looks good',
-      'Capability at high end is automatically better',
-      'Calibration/linearity problems distort readings across the range — fix measurement before trusting process stats at those levels',
+      'Only continuous gages need MSA',
+      'Disagreement proves the process is Six Sigma',
+      'Observed scrap rates mix process defects with inspection noise — fix criteria/training before analyzing the process',
+      'Attribute disagreement never affects DPMO'
     ],
-    correctIndex: 3,
+    correctIndex: 2,
     explanation:
-      'Linearity assesses how bias changes with reference value. Good mid-range performance does not excuse range-dependent bias. Process decisions at the high end would be systematically wrong.',
+      'Pass/fail systems need attribute agreement studies. Misclassification biases defect metrics and hypothesis tests on proportions.',
   },
   {
     id: 'chs-052',
     phase: 'measure',
-    topic: 'gage-rr',
-    type: 'scenario',
+    topic: 'msa',
+    type: 'mcq',
     difficulty: 'belt',
-    prompt:
-      'Inspectors rate cosmetic finish as Accept/Reject. A Belt runs continuous Type II %GRR formulas on coded 0/1 values. Problem?',
+    prompt: 'MSA Type I primarily evaluates…',
     choices: [
-      'None — 0/1 coding always validates continuous GRR',
-      'Attribute decisions need attribute agreement analysis (e.g. kappa / percent agreement vs standard), not continuous %GRR formulas',
-      'Only Cp can assess attribute systems',
-      'Cosmetic ratings never require MSA',
+      'Full multi-operator reproducibility across many parts only',
+      'Customer Kano delight features',
+      'Kanban bin quantities',
+      'Instrument bias and repeatability against a reference standard'
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
-      'Binary/ordinal appraisal systems use attribute MSA. Forcing continuous GRR on 0/1 codes abuses variance-component assumptions and can give nonsense %Study Variation.',
+      'Type I is reference-based (bias/Cg-style). Type II adds parts and operators for R&R.',
   },
   {
     id: 'chs-053',
     phase: 'measure',
-    topic: 'gage-rr',
-    type: 'mcq',
+    topic: 'gate-measure',
+    type: 'scenario',
     difficulty: 'master',
     prompt:
-      'ndc (number of distinct categories) from a Gage R&R study is about 1–2. What does that imply?',
+      'Gate Measure review: operational definitions unclear, no MSA, and a single Cp quoted from an unstable I-chart. What should the gate decide?',
     choices: [
-      'The gage can finely resolve many process groups',
-      'ndc is unrelated to discrimination',
-      'The measurement system barely distinguishes process variation — poor discrimination for process control/capability work',
-      'ndc = 1–2 means Six Sigma level performance',
+      'Do not pass — require definitions, MSA, and stability evidence before trusting the baseline',
+      'Pass because a Cp number exists',
+      'Skip to Improve solutions',
+      'Approve Analyze DOE immediately'
     ],
-    correctIndex: 2,
+    correctIndex: 0,
     explanation:
-      'ndc ≈ 1.41 × (σ_parts / σ_measurement). Values ≲ 2 mean the gage mostly cannot tell parts apart relative to measurement noise. Many guides want ndc ≥ 5 for useful process analysis.',
+      'Measure gates protect the project from analyzing noise. Definitions, MSA, and a stable baseline are non-negotiable.',
   },
   {
     id: 'chs-054',
     phase: 'measure',
     topic: 'msa',
-    type: 'scenario',
-    difficulty: 'belt',
+    type: 'calc',
+    difficulty: 'master',
     prompt:
-      'Gage R&R shows repeatability is acceptable, but reproducibility between operators dominates the GR&R. Best focus?',
+      'Gage study: repeatability variance = 0.04, reproducibility variance = 0.05, part variance = 0.91. Approximate %GRR of total variance?',
     choices: [
-      'Operator training, clearer operational definitions, and fixtures/methods that reduce between-operator differences',
-      'Buy a noisier gage to average out operators',
-      'Ignore reproducibility because repeatability passed',
-      'Only change the process specifications',
+      '≈91%',
+      '≈9%',
+      '≈10%',
+      '≈33%'
     ],
-    correctIndex: 0,
+    correctIndex: 1,
     explanation:
-      'Reproducibility issues are people/method/setup differences. Standardize the measurement method and train before interpreting process capability.',
+      'σ²_GRR = 0.04 + 0.05 = 0.09.\nTotal = 0.09 + 0.91 = 1.00.\n%GRR ≈ 0.09/1.00 = 9% (variance basis; %Study Variation uses σ ratios and can differ).',
   },
   {
     id: 'chs-055',
-    phase: 'measure',
+    phase: 'analyze',
     topic: 'msa',
     type: 'scenario',
-    difficulty: 'master',
+    difficulty: 'belt',
     prompt:
-      'A team jumps into a 16-run DOE on temperature and pressure using a micrometer later found to have %GRR = 55%. Likely consequence?',
+      'After improving a gage from 40% to 8% GRR, previously “significant” machine differences disappear in a re-run ANOVA. Likely explanation?',
     choices: [
-      'DOE results become more precise because noise adds information',
-      'Factor effects are automatically larger and easier to detect',
-      'MSA is irrelevant once DOE randomization is used',
-      'Measurement noise inflates error variance — real factor effects are harder to detect and may be misestimated; fix the gage and rethink the experiment',
+      'Lower %GRR always creates more false positives',
+      'The process must have gotten worse',
+      'Earlier differences were partly measurement artifacts; cleaner data changed the inference',
+      'ANOVA is invalid whenever MSA improves'
     ],
-    correctIndex: 3,
+    correctIndex: 2,
     explanation:
-      'DOE power and effect estimates depend on trustworthy Y. Huge measurement error swamps true response changes. Randomization does not remove measurement bias/noise — MSA still comes first.',
-    dgqTip: 'If %Study Variation is high, do not run DOE yet.',
+      'Measurement error can create spurious separation between groups. Re-analyzing with a trustworthy gage is the correct scientific response.',
   },
 ];
