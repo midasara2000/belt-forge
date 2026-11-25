@@ -32,6 +32,45 @@ export interface Question {
   correctIndex: number;
   explanation: string;
   dgqTip?: string;
+  /** Links to a teaching lesson for study-after-miss */
+  lessonId?: string;
+}
+
+export type VisualKind =
+  | 'dmaic'
+  | 'sipoc'
+  | 'kano'
+  | 'raci'
+  | 'msa'
+  | 'capability'
+  | 'pareto'
+  | 'controlchart'
+  | 'fishbone'
+  | 'fmea'
+  | 'vsm'
+  | 'doe'
+  | 'pull'
+  | 'smed'
+  | 'hypothesis'
+  | 'gate';
+
+export interface LessonSection {
+  heading: string;
+  body: string;
+}
+
+export interface Lesson {
+  id: string;
+  title: string;
+  phase: Phase;
+  /** Topics (question topic keys/labels) that resolve to this lesson */
+  topics: string[];
+  summary: string;
+  visual: VisualKind;
+  visualCaption: string;
+  sections: LessonSection[];
+  takeaways: string[];
+  dgqAngle?: string;
 }
 
 export interface TopicMeta {

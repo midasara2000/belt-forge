@@ -1,29 +1,44 @@
 import { useMemo, useState } from 'react';
 import { KnowledgeRadar } from './components/KnowledgeRadar';
-import { QuizSession } from './components/QuizSession';
+import { LearnLibrary } from './components/LearnLibrary';
+import { LessonView } from './components/LessonView';
+import { QuizSession, type QuizSnapshot } from './components/QuizSession';
 import { Results } from './components/Results';
 import { ACHIEVEMENTS } from './data/achievements';
-import { ALL_QUESTIONS, questionCount } from './data/questions';
+import { getLessonForTopic } from './data/lessons';
+import { ALL_QUESTIONS, questionCount, questionsForLesson } from './data/questions';
 import { PHASES, PHASE_ORDER, TOPICS, phaseLabel } from './data/topics';
 import { useProgress } from './hooks/useProgress';
-import { balancedBaseline, pickQuestions } from './lib/scoring';
+import { balancedBaseline, pickQuestions, shuffle } from './lib/scoring';
 import type { Phase, Question, SessionConfig } from './types';
 import './App.css';
 
+type ResultsScreen = {
+  kind: 'results';
+  config: SessionConfig;
+  correct: number;
+  total: number;
+  percent: number;
+  missed: Question[];
+};
+
 type Screen =
   | { kind: 'hub' }
-  | { kind: 'quiz'; config: SessionConfig }
-  | {
-      kind: 'results';
-      config: SessionConfig;
-      correct: number;
-      total: number;
-      percent: number;
-      missed: Question[];
-    }
+  | { kind: 'quiz'; config: SessionConfig; snapshot?: QuizSnapshot | null }
+  | ResultsScreen
   | { kind: 'phase-pick' }
   | { kind: 'achievements' }
-  | { kind: 'guide' };
+  | { kind: 'guide' }
+  | { kind: 'learn'; highlightIds?: string[] }
+  | {
+      kind: 'lesson';
+      lessonId: string;
+      returnTo:
+        | { kind: 'hub' }
+        | { kind: 'learn'; highlightIds?: string[] }
+        | { kind: 'quiz'; config: SessionConfig; snapshot?: QuizSnapshot | null }
+        | ResultsScreen;
+    };
 
 export default function App() {
   const {
@@ -43,7 +58,7 @@ export default function App() {
 
   function startSession(config: SessionConfig) {
     if (config.questions.length === 0) return;
-    setScreen({ kind: 'quiz', config });
+    setScreen({ kind: 'quiz', config, snapshot: null });
   }
 
   function startBaseline() {
@@ -130,6 +145,19 @@ export default function App() {
     });
   }
 
+  function practiceLesson(lessonId: string) {
+    const pool = questionsForLesson(lessonId);
+    startSession({
+      mode: 'blindspot',
+      title: 'Lesson practice',
+      questions: shuffle(pool).slice(0, Math.min(10, pool.length)),
+      timed: false,
+      seconds: null,
+      passPercent: null,
+      showImmediateFeedback: true,
+    });
+  }
+
   const weakLabels = useMemo(() => {
     return weak.map((w) => {
       const meta = TOPICS.find((t) => t.key === w.topic);
@@ -137,13 +165,55 @@ export default function App() {
     });
   }, [weak]);
 
+  if (screen.kind === 'lesson') {
+    const returnTo = screen.returnTo;
+    return (
+      <div className="app-shell">
+        <LessonView
+          lessonId={screen.lessonId}
+          onBack={() => setScreen(returnTo)}
+          onPractice={practiceLesson}
+          resumeLabel={returnTo.kind === 'quiz' ? 'Resume drill' : undefined}
+          onResume={returnTo.kind === 'quiz' ? () => setScreen(returnTo) : undefined}
+        />
+      </div>
+    );
+  }
+
+  if (screen.kind === 'learn') {
+    return (
+      <div className="app-shell">
+        <LearnLibrary
+          highlightIds={screen.highlightIds}
+          onBack={() => setScreen({ kind: 'hub' })}
+          onOpenLesson={(id) =>
+            setScreen({
+              kind: 'lesson',
+              lessonId: id,
+              returnTo: { kind: 'learn', highlightIds: screen.highlightIds },
+            })
+          }
+        />
+      </div>
+    );
+  }
+
   if (screen.kind === 'quiz') {
     return (
       <div className="app-shell">
         <QuizSession
+          key={`${screen.config.title}-${screen.snapshot?.index ?? 'start'}-${screen.config.questions[0]?.id}`}
           config={screen.config}
+          initial={screen.snapshot}
           onAnswer={(q, ok) => recordAnswer(q, ok, screen.config.mode)}
           onExit={() => setScreen({ kind: 'hub' })}
+          onStudyLesson={(lessonId, snapshot) => {
+            setScreen({
+              kind: 'lesson',
+              lessonId,
+              returnTo: { kind: 'quiz', config: screen.config, snapshot },
+            });
+          }}
           onComplete={({ correct, total, percent, missed }) => {
             if (screen.config.mode === 'baseline') {
               const scores = { ...progress.baselineScores };
@@ -172,6 +242,14 @@ export default function App() {
   }
 
   if (screen.kind === 'results') {
+    const missLessonIds = Array.from(
+      new Set(
+        screen.missed
+          .map((q) => getLessonForTopic(q.topic, q.phase)?.id)
+          .filter((id): id is string => !!id),
+      ),
+    );
+
     return (
       <div className="app-shell">
         <Results
@@ -182,6 +260,16 @@ export default function App() {
           passPercent={screen.config.passPercent}
           missed={screen.missed}
           onHome={() => setScreen({ kind: 'hub' })}
+          onStudyLesson={(lessonId) =>
+            setScreen({
+              kind: 'lesson',
+              lessonId,
+              returnTo: screen,
+            })
+          }
+          onOpenLearnMisses={() =>
+            setScreen({ kind: 'learn', highlightIds: missLessonIds })
+          }
           onAgain={() => {
             const mode = screen.config.mode;
             if (mode === 'baseline') startBaseline();
@@ -303,9 +391,9 @@ export default function App() {
           <section>
             <h3>How to use this coach</h3>
             <ol>
+              <li>Browse Learn & recap for visuals and teaching cards.</li>
               <li>Run the Baseline once to map phase strengths.</li>
-              <li>Attack Blind Spots and Tool Match daily.</li>
-              <li>Do Calc Challenge with only a basic calculator.</li>
+              <li>On misses, tap Study to open the linked lesson, then practice that topic.</li>
               <li>Sit a full Mock Exam under the 90-minute timer before the real day.</li>
             </ol>
           </section>
@@ -322,8 +410,7 @@ export default function App() {
           <p className="eyebrow">UMS curriculum · DGQ exam prep</p>
           <h1>Belt Forge</h1>
           <p className="hero__tag">
-            Interactive Black Belt trainer — map your baseline, crush blind spots, rehearse the
-            exam.
+            Learn with visuals, drill with questions, and jump to lessons whenever you miss.
           </p>
         </div>
         <div className="hero__stats">
@@ -397,6 +484,13 @@ export default function App() {
         <h2 className="section-title">Play modes</h2>
         <div className="mode-grid">
           <ModeCard
+            title="Learn & Recap"
+            blurb="Teaching cards with diagrams — SIPOC, MSA, Cp/Cpk, DOE, pull, and more."
+            action="Open library"
+            accent="#134e41"
+            onClick={() => setScreen({ kind: 'learn' })}
+          />
+          <ModeCard
             title="Knowledge Baseline"
             blurb="25 balanced questions across Define→Control. Map where you stand."
             action={progress.baselineDone ? 'Retake' : 'Start'}
@@ -414,7 +508,7 @@ export default function App() {
           />
           <ModeCard
             title="Blind Spot Trainer"
-            blurb="Adaptive set weighted toward your weakest topics."
+            blurb="Adaptive set weighted toward your weakest topics — with study links on misses."
             action="Train weak areas"
             accent="#B86B2B"
             onClick={startBlindspot}
@@ -433,19 +527,15 @@ export default function App() {
             accent="#3D4A6B"
             onClick={startCalc}
           />
-          <ModeCard
-            title="Rapid Drill"
-            blurb="12 mixed questions against the clock. Build fluency."
-            action="Quick fire"
-            accent="#5B6E5E"
-            onClick={startDrill}
-          />
         </div>
       </section>
 
       <section className="secondary-nav">
         <button type="button" className="secondary" onClick={() => setScreen({ kind: 'phase-pick' })}>
           Train by phase
+        </button>
+        <button type="button" className="secondary" onClick={startDrill}>
+          Rapid drill
         </button>
         <button
           type="button"

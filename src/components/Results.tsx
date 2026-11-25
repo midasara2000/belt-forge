@@ -1,3 +1,4 @@
+import { getLessonForTopic } from '../data/lessons';
 import type { Question } from '../types';
 
 interface Props {
@@ -10,6 +11,8 @@ interface Props {
   onRetryMissed: () => void;
   onHome: () => void;
   onAgain: () => void;
+  onStudyLesson: (lessonId: string) => void;
+  onOpenLearnMisses: () => void;
 }
 
 export function Results({
@@ -22,8 +25,20 @@ export function Results({
   onRetryMissed,
   onHome,
   onAgain,
+  onStudyLesson,
+  onOpenLearnMisses,
 }: Props) {
   const passed = passPercent != null ? percent >= passPercent : percent >= 70;
+
+  const lessonLinks = Array.from(
+    new Map(
+      missed
+        .map((q) => getLessonForTopic(q.topic, q.phase))
+        .filter((l): l is NonNullable<typeof l> => !!l)
+        .map((l) => [l.id, l]),
+    ).values(),
+  );
+
   return (
     <div className="results">
       <p className="eyebrow">{title}</p>
@@ -53,21 +68,51 @@ export function Results({
         <div className="results__missed">
           <h3>Blind spots from this run</h3>
           <ul>
-            {missed.slice(0, 8).map((q) => (
-              <li key={q.id}>
-                <span className="tag">{q.phase}</span> {q.prompt.slice(0, 110)}
-                {q.prompt.length > 110 ? '…' : ''}
-              </li>
-            ))}
+            {missed.slice(0, 8).map((q) => {
+              const lesson = getLessonForTopic(q.topic, q.phase);
+              return (
+                <li key={q.id}>
+                  <span className="tag">{q.phase}</span> {q.prompt.slice(0, 90)}
+                  {q.prompt.length > 90 ? '…' : ''}
+                  {lesson && (
+                    <button
+                      type="button"
+                      className="linkish"
+                      onClick={() => onStudyLesson(lesson.id)}
+                    >
+                      Study {lesson.title}
+                    </button>
+                  )}
+                </li>
+              );
+            })}
           </ul>
+        </div>
+      )}
+
+      {lessonLinks.length > 0 && (
+        <div className="results__lessons">
+          <h3>Recap these lessons</h3>
+          <div className="results__lesson-chips">
+            {lessonLinks.map((l) => (
+              <button key={l.id} type="button" className="chip chip--btn" onClick={() => onStudyLesson(l.id)}>
+                {l.title}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
       <div className="results__actions">
         {missed.length > 0 && (
-          <button type="button" className="primary" onClick={onRetryMissed}>
-            Drill missed questions
-          </button>
+          <>
+            <button type="button" className="primary" onClick={onOpenLearnMisses}>
+              Learn missed topics
+            </button>
+            <button type="button" className="secondary" onClick={onRetryMissed}>
+              Drill missed questions
+            </button>
+          </>
         )}
         <button type="button" className="secondary" onClick={onAgain}>
           Play again
