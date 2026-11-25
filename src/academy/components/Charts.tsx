@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { linearFit, mean, pearson } from '../rng';
+import { linearFit, mean, pearson, sd } from '../rng';
+import { iChartLimits, invNorm, median } from '../stats';
 
 const W = 340;
 const H = 210;
@@ -349,6 +350,193 @@ export function StackedBars({
           </text>
         </g>
       ))}
+    </Frame>
+  );
+}
+
+export function Pareto({
+  bars,
+  yLabel = 'Percent',
+}: {
+  bars: { label: string; value: number }[];
+  yLabel?: string;
+}) {
+  const sorted = [...bars].sort((a, b) => b.value - a.value);
+  const total = sorted.reduce((s, b) => s + b.value, 0) || 1;
+  const cum = sorted.map((_, i) => (sorted.slice(0, i + 1).reduce((s, b) => s + b.value, 0) / total) * 100);
+  const sy = (v: number) => M.t + IH - (v / 100) * IH;
+  const slot = IW / sorted.length;
+  const pts = cum.map((c, i) => `${M.l + slot * i + slot / 2},${sy(c)}`).join(' ');
+  return (
+    <Frame yLabel={yLabel} label="Pareto chart with cumulative percent">
+      <YAxis ticks={[0, 25, 50, 75, 100]} sy={sy} />
+      <line x1={M.l} x2={M.l + IW} y1={M.t + IH} y2={M.t + IH} stroke={INK} strokeOpacity={0.4} />
+      {sorted.map((b, i) => {
+        const pct = (b.value / total) * 100;
+        return (
+          <g key={b.label}>
+            <rect
+              x={M.l + slot * i + slot * 0.18}
+              y={sy(pct)}
+              width={slot * 0.64}
+              height={M.t + IH - sy(pct)}
+              fill={TEAL}
+              fillOpacity={0.8}
+              rx={2}
+            />
+            <text x={M.l + slot * i + slot / 2} y={M.t + IH + 14} textAnchor="middle" fontSize="10" fill={MUTED}>
+              {b.label}
+            </text>
+          </g>
+        );
+      })}
+      <polyline points={pts} fill="none" stroke={AMBER} strokeWidth={2} />
+      {cum.map((c, i) => (
+        <g key={sorted[i].label}>
+          <circle cx={M.l + slot * i + slot / 2} cy={sy(c)} r={3.1} fill={AMBER} />
+          <text
+            x={M.l + slot * i + slot / 2}
+            y={Math.max(11, sy(c) - 7)}
+            textAnchor="middle"
+            fontSize="10"
+            fontWeight={700}
+            fill={INK}
+            stroke="#fff"
+            strokeWidth="3"
+            paintOrder="stroke"
+          >
+            {Math.round(c)}%
+          </text>
+        </g>
+      ))}
+    </Frame>
+  );
+}
+
+export function RunChart({
+  values,
+  xLabel = 'Observation order',
+  yLabel,
+  markFrom,
+}: {
+  values: number[];
+  xLabel?: string;
+  yLabel: string;
+  markFrom?: number;
+}) {
+  const c = median(values);
+  const lo = Math.min(...values);
+  const hi = Math.max(...values);
+  const pad = (hi - lo) * 0.14 || 1;
+  const min = lo - pad;
+  const max = hi + pad;
+  const sx = (i: number) => M.l + (values.length === 1 ? IW / 2 : (i / (values.length - 1)) * IW);
+  const sy = (v: number) => M.t + IH - ((v - min) / (max - min)) * IH;
+  const line = values.map((v, i) => `${sx(i)},${sy(v)}`).join(' ');
+  const medLabel = Number.isInteger(c) ? String(c) : c.toFixed(1);
+  return (
+    <Frame xLabel={xLabel} yLabel={yLabel} label={`Run chart of ${yLabel}`}>
+      <YAxis ticks={niceTicks(min, max, 5)} sy={sy} />
+      <XAxis ticks={niceTicks(1, values.length, 4).filter((t) => t >= 1 && t <= values.length)} sx={(v) => sx(v - 1)} />
+      <line x1={M.l} x2={M.l + IW} y1={sy(c)} y2={sy(c)} stroke={AMBER} strokeDasharray="5 3" />
+      <text x={M.l + IW - 4} y={sy(c) - 5} textAnchor="end" fontSize="10" fill={AMBER}>
+        median {medLabel}
+      </text>
+      <polyline points={line} fill="none" stroke={TEAL} strokeWidth={1.6} />
+      {values.map((v, i) => (
+        <circle key={i} cx={sx(i)} cy={sy(v)} r={3.3} fill={markFrom != null && i >= markFrom ? WINE : TEAL} />
+      ))}
+    </Frame>
+  );
+}
+
+export function ControlChart({ values, yLabel }: { values: number[]; yLabel: string }) {
+  const { cl, ucl, lcl } = iChartLimits(values);
+  const lo = Math.min(...values, lcl);
+  const hi = Math.max(...values, ucl);
+  const pad = (hi - lo) * 0.12 || 1;
+  const min = lo - pad;
+  const max = hi + pad;
+  const sx = (i: number) => M.l + (values.length === 1 ? IW / 2 : (i / (values.length - 1)) * IW);
+  const sy = (v: number) => M.t + IH - ((v - min) / (max - min)) * IH;
+  const line = values.map((v, i) => `${sx(i)},${sy(v)}`).join(' ');
+  const guide = (v: number, label: string, color: string) => (
+    <g>
+      <line x1={M.l} x2={M.l + IW} y1={sy(v)} y2={sy(v)} stroke={color} strokeDasharray={label === 'CL' ? undefined : '4 3'} />
+      <text x={M.l + IW - 2} y={sy(v) - 3} textAnchor="end" fontSize="10" fill={color}>
+        {label} {v.toFixed(2)}
+      </text>
+    </g>
+  );
+  return (
+    <Frame xLabel="Observation order" yLabel={yLabel} label={`Individuals chart of ${yLabel}`}>
+      <YAxis ticks={niceTicks(min, max, 5)} sy={sy} />
+      <XAxis ticks={niceTicks(1, values.length, 4).filter((t) => t >= 1 && t <= values.length)} sx={(v) => sx(v - 1)} />
+      {guide(ucl, 'UCL', WINE)}
+      {guide(cl, 'CL', AMBER)}
+      {guide(lcl, 'LCL', WINE)}
+      <polyline points={line} fill="none" stroke={TEAL} strokeWidth={1.5} />
+      {values.map((v, i) => {
+        const out = v > ucl || v < lcl;
+        return <circle key={i} cx={sx(i)} cy={sy(v)} r={out ? 4.2 : 3.2} fill={out ? WINE : TEAL} />;
+      })}
+    </Frame>
+  );
+}
+
+export function ProbPlot({ values, yLabel }: { values: number[]; yLabel: string }) {
+  const sorted = [...values].sort((a, b) => a - b);
+  const n = sorted.length;
+  const zs = sorted.map((_, i) => invNorm((i + 0.5) / n));
+  const m = mean(values);
+  const sigma = sd(values);
+  const zmin = Math.min(...zs);
+  const zmax = Math.max(...zs);
+  const yLine = (z: number) => m + sigma * z;
+  const ymin = Math.min(...sorted, yLine(zmin));
+  const ymax = Math.max(...sorted, yLine(zmax));
+  const xpad = (zmax - zmin) * 0.08 || 0.2;
+  const ypad = (ymax - ymin) * 0.1 || 1;
+  const sx = (z: number) => M.l + ((z - (zmin - xpad)) / (zmax - zmin + 2 * xpad)) * IW;
+  const sy = (v: number) => M.t + IH - ((v - (ymin - ypad)) / (ymax - ymin + 2 * ypad)) * IH;
+  return (
+    <Frame xLabel="Theoretical normal quantile" yLabel={yLabel} label={`Normal probability plot of ${yLabel}`}>
+      <YAxis ticks={niceTicks(ymin - ypad, ymax + ypad, 5)} sy={sy} />
+      <XAxis ticks={niceTicks(zmin - xpad, zmax + xpad, 5)} sx={sx} />
+      <line x1={sx(zmin)} y1={sy(yLine(zmin))} x2={sx(zmax)} y2={sy(yLine(zmax))} stroke={AMBER} strokeWidth={1.8} />
+      {sorted.map((v, i) => (
+        <circle key={i} cx={sx(zs[i])} cy={sy(v)} r={3.2} fill={TEAL} fillOpacity={0.75} />
+      ))}
+    </Frame>
+  );
+}
+
+export function EffectsChart({ effects }: { effects: { label: string; value: number }[] }) {
+  const vals = effects.map((e) => e.value);
+  const min = Math.min(0, ...vals);
+  const max = Math.max(0, ...vals);
+  const pad = (max - min) * 0.16 || 1;
+  const lo = min - pad;
+  const hi = max + pad;
+  const sy = (v: number) => M.t + IH - ((v - lo) / (hi - lo)) * IH;
+  const slot = IW / effects.length;
+  return (
+    <Frame yLabel="Effect" label="Factor effects">
+      <YAxis ticks={niceTicks(lo, hi, 5)} sy={sy} />
+      <line x1={M.l} x2={M.l + IW} y1={sy(0)} y2={sy(0)} stroke={INK} strokeOpacity={0.45} />
+      {effects.map((e, i) => {
+        const y = sy(Math.max(e.value, 0));
+        const h = Math.abs(sy(e.value) - sy(0));
+        const cx = M.l + slot * i + slot / 2;
+        return (
+          <g key={e.label}>
+            <rect x={cx - Math.min(22, slot * 0.28)} y={y} width={Math.min(44, slot * 0.56)} height={Math.max(h, 1)} fill={e.value >= 0 ? TEAL : WINE} fillOpacity={0.82} rx={2} />
+            <text x={cx} y={M.t + IH + 14} textAnchor="middle" fontSize="10" fill={MUTED}>
+              {e.label}
+            </text>
+          </g>
+        );
+      })}
     </Frame>
   );
 }

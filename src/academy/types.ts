@@ -30,7 +30,15 @@ export type Visual =
       xLabel: string;
       yLabel: string;
       fit?: boolean;
+      showStats?: boolean;
     }
+  | { type: 'runChart'; values: number[]; xLabel?: string; yLabel: string; markFrom?: number }
+  | { type: 'pareto'; bars: { label: string; value: number }[]; yLabel?: string }
+  | { type: 'controlChart'; values: number[]; yLabel: string }
+  | { type: 'probPlot'; values: number[]; yLabel: string }
+  | { type: 'effects'; effects: { label: string; value: number }[] }
+  | { type: 'fishbone'; effect: string; bones: { label: string; causes: string[] }[] }
+  | { type: 'flow'; steps: { label: string; note: string; kind: 'va' | 'nva' | 'wait' }[] }
   | { type: 'boxplot'; groups: { label: string; values: number[] }[]; yLabel: string }
   | { type: 'bars'; bars: { label: string; value: number }[]; yLabel: string; stacked?: never }
   | {
@@ -107,7 +115,7 @@ export interface OrderCard {
   explanation: string;
 }
 
-export type SimKind = 'resolution' | 'sampleSize' | 'correlation';
+export type SimKind = 'resolution' | 'sampleSize' | 'correlation' | 'binWidth' | 'runShift';
 
 export interface SliderCard {
   kind: 'slider';

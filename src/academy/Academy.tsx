@@ -43,8 +43,8 @@ export function Academy({ onExit }: Props) {
         <p className="eyebrow">Analyze Academy · building blocks</p>
         <h2 className="section-title">Analyze, one block at a time</h2>
         <p className="lede">
-          Short cards: learn one idea, then use it — label data, pick tools, read Minitab output, drag
-          sliders. Recommended order is top to bottom, but you can open any lesson.
+          The full Analyze path, one block at a time: see the data, choose a tool, test it, then confirm
+          the causes. Recommended order is top to bottom, and any lesson can be opened.
         </p>
         <div className="ac-map__stats">
           <span>

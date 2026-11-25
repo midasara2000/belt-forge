@@ -615,6 +615,79 @@
   text-align: right;
 }
 
+.ac-flow {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.ac-flow__step {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: #fff;
+  font-size: 0.88rem;
+}
+
+.ac-flow__step strong {
+  font-weight: 650;
+}
+
+.ac-flow__step span {
+  color: var(--muted);
+  text-align: right;
+}
+
+.ac-flow__step.is-va { border-left: 4px solid var(--teal); }
+.ac-flow__step.is-wait { border-left: 4px solid var(--wine); }
+.ac-flow__step.is-nva { border-left: 4px solid var(--amber); }
+
+.ac-fish {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.ac-fish__bones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+}
+
+.ac-fish__bone {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.45rem 0.6rem 0.35rem;
+}
+
+.ac-fish__bone strong {
+  display: block;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 0.15rem;
+}
+
+.ac-fish__bone ul {
+  margin: 0;
+  padding-left: 1rem;
+  font-size: 0.82rem;
+}
+
+.ac-fish__head {
+  justify-self: end;
+  background: var(--ink);
+  color: #fff;
+  font-weight: 650;
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.88rem;
+}
+
 /* Tables & Minitab */
 
 .ac-table-wrap {

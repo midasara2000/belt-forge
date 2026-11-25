@@ -1,6 +1,6 @@
 # Belt Forge — Agent Handoff
 
-Last updated: 2026-11-25 (v2.0.0 live). Written so a fresh agent can continue without re-investigating.
+Last updated: 2026-11-25 (v3.0.0, full Analyze Academy). Written so a fresh agent can continue without re-investigating.
 
 ---
 
@@ -46,20 +46,22 @@ src/
     QuizSession.tsx       quiz engine; per-presentation choice shuffle (ChoicePresentation) + QuizSnapshot resume
     Results.tsx, LearnLibrary.tsx, LessonView.tsx, LessonVisuals.tsx (16 SVG diagrams),
     SkillPath.tsx, KnowledgeRadar.tsx, VersionMark.tsx
-  academy/                ← NEW interactive "Analyze Academy" (v2.0.0), self-contained
+  academy/                ← interactive "Analyze Academy" (v3.0.0, all 10 modules), self-contained
     types.ts              AcademyModule → AcademyLesson → AcademyCard (union), Visual (union), MinitabOutput
-    course.ts             ANALYZE_COURSE (10 modules; 2 authored, 8 `planned(...)` stubs), allLessons, nextLessonAfter
-    content/module1-data-types.ts       Module 1 (6 lessons incl. checkpoint)
-    content/module4-tool-selection.ts   Module 4 (5 lessons incl. checkpoint) + Minitab outputs
+    stats.ts              t / F / chi-square / proportion helpers, I-chart limits, factorial effects. Lessons call these so quoted numbers match the charts.
+    minitab.ts            Session-window panels built from those results
+    course.ts             ANALYZE_COURSE (10 modules, all authored), allLessons, nextLessonAfter
+    content/module1-data-types.ts … module10-cause.ts   one file per module
     components/Cards.tsx       card renderers + RichText (**bold**, "- " bullets) + hint→retry→reveal logic
     components/LessonPlayer.tsx  progress bar, sticky Continue footer, completion screen, scoring
-    components/Charts.tsx      SVG Histogram, Scatter (fit + r/R²), BoxPlot, Bars, StackedBars, DotStrip
-    components/VisualView.tsx  Visual dispatcher + MinitabPanel + DataTypeTree + ToolMatrix + tag cloud
-    components/Sims.tsx        slider sims: 'resolution' | 'sampleSize' | 'correlation'
+    components/Charts.tsx      SVG charts: histogram, scatter, box, bars, Pareto, run, I-chart, probability plot, effects
+    components/VisualView.tsx  Visual dispatcher, plus fishbone and flow strip
+    components/Sims.tsx        slider sims: resolution, sampleSize, correlation, binWidth, runShift
     rng.ts                 seeded PRNG (mulberry32), normals(), mean/sd/pearson/linearFit, shuffleSeeded
     useAcademyProgress.ts  localStorage key 'belt-forge-academy-v1' {lessons:{[id]:LessonResult}, xp}
     Academy.tsx            course map + routes into LessonPlayer
     academy.css
+scripts/check-academy.ts    integrity + golden stats (`npx tsx scripts/check-academy.ts`)
 ```
 
 ### Key data schemas
@@ -95,7 +97,8 @@ Scoring: each graded card earns 2 points (first try), 1 point (right after the h
 | 1.6 | Bank expanded **133 → 273** (Cp/Cpk, DPMO, charts, TOC/takt/Little's Law, stats, DOE) | Script check: 273 Qs, 0 without lessonId; build passes |
 | 1.7 | Skill Path (Duolingo-style tree, crowns, sequential unlock) | Build passes; live bundle contains it |
 | 1.8 | Deepened lessons `stats-inference`, `charts-variation`, `capability`, `doe`, `process-lean-maps`; LessonView renders paragraphs/bullets | Live |
-| **2.0.0** | **Analyze Academy**: Module 1 + Module 4, 11 lessons, 60 cards (19 concept, 23 choice, 8 classify, 5 numeric, 2 order, 3 slider) | See below |
+| **2.0.0** | **Analyze Academy** started: Module 1 + Module 4 | See below |
+| **3.0.0** | **Full Analyze Academy**: modules 1–10, 51 lessons, 239 cards (61 concept, 114 choice, 14 classify, 32 numeric, 11 order, 7 slider). New visuals: Pareto, run chart, I-chart, probability plot, effects, fishbone, flow. New sims: bin width, run shift. | `npx tsx scripts/check-academy.ts` OK. Playwright 414×860, 0 console errors. |
 
 **v2.0.0 verification (done):**
 - `tsc -b` + `vite build` pass. A content-integrity script confirmed every `answer` id exists in its options/categories.
@@ -116,7 +119,7 @@ Scoring: each graded card earns 2 points (first try), 1 point (right after the h
 - Wrong answers: **hint → retry → reveal** (no hearts/lives).
 - Math depth: **exam level**. Interpret outputs plus simple calculator arithmetic; no derivations.
 - Academy is a **new hub mode**. Do not remove Skill Path, Learn & Recap, or the quiz modes.
-- Build-first scope was M1 + M4. The user is now asked to play-test before the remaining modules are built.
+- Build-first scope was M1 + M4. v3.0.0 then authored the rest of Analyze (M2, M3, M5–M10) in book order of ideas: pictures, stratification, then inference, groups, regression, DOE, flow, causes. Control-chart *selection* (which chart for which data) stays a Control-phase topic; M2 only teaches the individuals chart and common vs special cause.
 
 **Rejected / failed approaches:**
 - Fixed or build-time choice ordering: rejected. The authored data had the correct answer at index 0 for most DEFINE/MEASURE questions, so the user saw "always A". A seeded build-time shuffle was also rejected ("why predetermined?"). Use a **runtime shuffle** every time.
@@ -150,49 +153,22 @@ Commits are authored as `Alex Pearce <midasara2000@gmail.com>` via `git -c user.
 
 ## 4. Current bugs / unfinished work
 
-- **No known functional bugs** in v2.0.0.
-- **Unfinished: Academy modules 2, 3, 5, 6, 7, 8, 9, 10** are `planned(...)` stubs in `src/academy/course.ts`. They show as "Coming next" with their UMS topics.
-- **Awaiting user feedback** on card length, text amount, difficulty and exercise mix (asked at the end of the last turn). Incorporate it before mass-authoring.
+- **No known functional bugs** in v3.0.0. The Analyze Academy has no `comingSoon` modules.
+- **Awaiting user feedback** on card length, text amount, difficulty and exercise mix across the full path. Adjust existing lessons from that feedback before opening a new phase academy.
 - Minor or tech debt:
-  - The bundle is about 800 kB, which triggers Vite's chunk-size warning. It's harmless; code-splitting the Academy with `React.lazy` is optional.
+  - The bundle is about 1 MB, which triggers Vite's chunk-size warning. It's harmless; code-splitting the Academy with `React.lazy` is optional.
   - Academy XP (`belt-forge-academy-v1`) is separate from the main hub XP/rank. Unify it only if the user wants that.
   - The 5 oxlint warnings listed above.
   - The version badge is sticky and can overlap page eyebrow text when scrolled (cosmetic).
   - In `fullPage` Playwright screenshots, the fixed footer appears mid-page. That's a screenshot artifact, not a bug.
-- The text lessons for Define/Improve/Control (`src/data/lessons.ts`) are still recap-depth. That's acceptable; the Academy approach may later extend to other phases.
+- The text lessons for Define, Measure (MSA, DPMO, Cp/Cpk), Improve and Control (`src/data/lessons.ts`) are still recap-depth. Measure’s MSA / performance / capability chapters are the highest-value gap relative to the UMS contents. Control-chart selection (which chart for which data type) belongs in a future Control academy, not in Module 2.
 
 ---
 
 ## 5. Immediate next step
 
-**Task:** Author **Academy Module 2 — "Seeing your data"** (graphical analysis). It's the next building block after data types and comes before tool selection. Apply any feedback the user gives on Module 1 and 4 first.
+**Do not author another phase until the user has played v3.0.0.** The live badge must read **v3.0.0**.
 
-**Target files:**
-- New: `src/academy/content/module2-seeing-data.ts`, exporting `module2: AcademyModule` (`id: 'm2'`, `number: 2`).
-- Edit: `src/academy/course.ts`. Replace the `planned(2, ...)` entry with `module2`.
-- Optionally extend `src/academy/components/Charts.tsx` / `VisualView.tsx` / `types.ts` with new visual types:
-  - `runChart` (time-ordered points + median line)
-  - `pareto` (sorted bars + cumulative % line)
-  - `controlChart` (I-chart with UCL/CL/LCL and a flagged point)
-  - `probPlot` (normal probability plot)
-- Bump `src/version.ts` to `2.1.0`.
+When they want the next academy, build a **Measure academy** (MSA including Gage R&R binary / Type I / Type II / linearity, DPMO / ppm / DPU / yield, Cp/Cpk and stability). Reuse the card, chart and Minitab patterns. Keep answers computed in `stats.ts`. Bump `APP_VERSION`. Run `npx tsx scripts/check-academy.ts`, `npm run lint`, `npm run build`, and a 414 px Playwright pass.
 
-**Suggested lessons** (about 5–8 cards each, following the existing patterns):
-1. Histogram: shape, centre, spread, bimodal = mixture, skew, specs on the histogram.
-2. Box plot: reading quartiles, whiskers and outliers; comparing groups.
-3. Run chart and time order: trends, shifts, the "histogram hides time" trap.
-4. Pareto: the vital few, the cumulative %, and the flat-Pareto trap.
-5. Scatter and probability plot: association strength, curvature, normality.
-6. Common vs special cause on an I-chart: tampering, rule violations.
-7. Checkpoint.
-
-Include classify cards (match the chart to the question), read-chart choice cards, at least one numeric card (e.g. read a cumulative % or count from a Pareto), at least one slider sim (e.g. histogram bin width, or adding a shift to a run chart), and one order card.
-
-**Acceptance criteria:**
-1. `npm run build` passes, and `npm run lint` adds no new errors.
-2. A content-integrity script passes: every choice/slider `answer` exists in its options, and every classify item's `answer` exists in its categories. Template: iterate `ANALYZE_COURSE` with `npx tsx`.
-3. Every number quoted in a prompt, option or explanation matches what the chart or sim actually displays (verify by script for computed values).
-4. Answer ids are spread across options. The runtime shuffle handles position.
-5. A Playwright run at 414×860 completes at least one full Module 2 lesson with 0 console errors, including one wrong→hint→retry interaction. Save a `.webm` plus key screenshots to `/opt/cursor/artifacts/`.
-6. Deployed to `gh-pages`, and the live bundle contains `v2.1.0`. Tell the user to hard-refresh and check the badge.
-7. Then continue in order: M3 Stratification → M5 Hypothesis & CIs → M6 Comparing groups → M7 Regression → M8 DOE → M9 Process & flow → M10 Cause analysis. Each module gets its own content file, the same verification steps, and a version bump.
+After that, the book’s highest-yield remaining clusters are Improve selection (must criteria, effort-benefit, N/3, Pugh) and Control charts. Define project-management topics can stay at recap depth.
