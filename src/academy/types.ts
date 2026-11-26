@@ -48,6 +48,7 @@ export type Visual =
       yLabel: string;
     }
   | { type: 'dotstrip'; values: number[]; xLabel: string }
+  | { type: 'type1'; values: number[]; reference: number; tolerance: number; yLabel: string }
   | { type: 'dataTypeTree' }
   | { type: 'toolMatrix'; highlight?: 'cc' | 'dc' | 'cd' | 'dd' }
   | { type: 'minitab'; output: MinitabOutput }
@@ -115,7 +116,7 @@ export interface OrderCard {
   explanation: string;
 }
 
-export type SimKind = 'resolution' | 'sampleSize' | 'correlation' | 'binWidth' | 'runShift';
+export type SimKind = 'resolution' | 'sampleSize' | 'correlation' | 'binWidth' | 'runShift' | 'type1Bias';
 
 export interface SliderCard {
   kind: 'slider';

@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { AcademyProgress } from './types';
 
-const KEY = 'belt-forge-academy-v1';
+/** Analyze Academy. Do not rename: existing progress is stored under this key. */
+export const ANALYZE_STORAGE_KEY = 'belt-forge-academy-v1';
 
-function load(): AcademyProgress {
+/** Measure / MSA Academy. Separate from Analyze so finishing one course does not mark the other done. */
+export const MEASURE_STORAGE_KEY = 'belt-forge-measure-academy-v1';
+
+function load(storageKey: string): AcademyProgress {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(storageKey);
     if (raw) {
       const parsed = JSON.parse(raw) as AcademyProgress;
       return { lessons: parsed.lessons ?? {}, xp: parsed.xp ?? 0 };
@@ -16,12 +20,12 @@ function load(): AcademyProgress {
   return { lessons: {}, xp: 0 };
 }
 
-export function useAcademyProgress() {
-  const [progress, setProgress] = useState<AcademyProgress>(load);
+export function useAcademyProgress(storageKey = ANALYZE_STORAGE_KEY) {
+  const [progress, setProgress] = useState<AcademyProgress>(() => load(storageKey));
 
   useEffect(() => {
-    localStorage.setItem(KEY, JSON.stringify(progress));
-  }, [progress]);
+    localStorage.setItem(storageKey, JSON.stringify(progress));
+  }, [progress, storageKey]);
 
   const completeLesson = useCallback((lessonId: string, score: number, maxScore: number) => {
     setProgress((prev) => {

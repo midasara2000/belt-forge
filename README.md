@@ -5,6 +5,7 @@ Interactive, gamified study coach aligned to the **UMS** DMAIC curriculum for **
 ## Modes
 
 - **Analyze Academy** — bite-sized interactive lessons for the whole Analyze phase (charts, tests, DOE, flow, causes)
+- **Measure Academy** — MSA Type 1, 2 and 3, plus pass/fail agreement (Cg, Cgk, %GRR, ndc, kappa)
 - **Knowledge Baseline** — 25 questions across Define→Control; builds your phase radar
 - **DGQ Mock Exam** — 50 questions, 90-minute timer, 80% pass line, no instant feedback
 - **Blind Spot Trainer** — adaptive practice on your weakest topics

@@ -353,3 +353,51 @@ export function factorialEffect(ys: number[], signs: number[]): number {
   for (let i = 0; i < ys.length; i++) s += signs[i] * ys[i];
   return s / (ys.length / 2);
 }
+
+/**
+ * Type 1 gauge index. Cg = (0.2 × tolerance) / (6 × s).
+ * The 0.2 is the share of the tolerance the gauge is allowed to consume.
+ * Cg ignores where the mean sits.
+ */
+export function cg(tolerance: number, s: number): number {
+  return (0.2 * tolerance) / (6 * s);
+}
+
+/**
+ * Type 1 gauge index with bias. Cgk = (0.1 × tolerance − |bias|) / (3 × s).
+ * Bias is the mean minus the reference. A large bias lowers Cgk and leaves Cg unchanged.
+ */
+export function cgk(tolerance: number, s: number, bias: number): number {
+  return (0.1 * tolerance - Math.abs(bias)) / (3 * s);
+}
+
+/** Combined measurement standard deviation: √(EV² + AV²). Pass standard deviations, not variances. */
+export function grrSigma(ev: number, av: number): number {
+  return Math.sqrt(ev * ev + av * av);
+}
+
+/** %Study Variation = 100 × σ_GRR / σ_total, with σ_total = √(σ_GRR² + σ_part²). */
+export function studyVariationPct(grr: number, part: number): number {
+  const total = Math.sqrt(grr * grr + part * part);
+  return (100 * grr) / total;
+}
+
+/** %Tolerance = 100 × (6 × σ_GRR) / tolerance. */
+export function tolerancePct(grr: number, tolerance: number): number {
+  return (100 * 6 * grr) / tolerance;
+}
+
+/** Number of distinct categories: 1.41 × σ_part / σ_GRR. The reported ndc is the integer part. */
+export function ndc(part: number, grr: number): number {
+  return (1.41 * part) / grr;
+}
+
+/** Range method for repeatability: σ_EV = average range / d₂. */
+export function repeatabilityFromRange(averageRange: number, d2: number): number {
+  return averageRange / d2;
+}
+
+/** Share of total variance that belongs to the measurement system, in percent. */
+export function varianceSharePct(evVar: number, avVar: number, partVar: number): number {
+  return (100 * (evVar + avVar)) / (evVar + avVar + partVar);
+}

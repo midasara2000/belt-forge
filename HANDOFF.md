@@ -1,6 +1,6 @@
 # Belt Forge — Agent Handoff
 
-Last updated: 2026-11-25 (v3.0.0, full Analyze Academy). Written so a fresh agent can continue without re-investigating.
+Last updated: 2026-11-26 (v3.1.0, Measure Academy for MSA Type 1–3). Written so a fresh agent can continue without re-investigating.
 
 ---
 
@@ -46,19 +46,22 @@ src/
     QuizSession.tsx       quiz engine; per-presentation choice shuffle (ChoicePresentation) + QuizSnapshot resume
     Results.tsx, LearnLibrary.tsx, LessonView.tsx, LessonVisuals.tsx (16 SVG diagrams),
     SkillPath.tsx, KnowledgeRadar.tsx, VersionMark.tsx
-  academy/                ← interactive "Analyze Academy" (v3.0.0, all 10 modules), self-contained
+  academy/                ← Analyze Academy (10 modules) and Measure Academy / MSA (5 modules)
     types.ts              AcademyModule → AcademyLesson → AcademyCard (union), Visual (union), MinitabOutput
-    stats.ts              t / F / chi-square / proportion helpers, I-chart limits, factorial effects. Lessons call these so quoted numbers match the charts.
+    stats.ts              t / F / chi-square helpers, I-chart limits, factorial effects, plus Cg, Cgk, GRR, %Study Variation, ndc
     minitab.ts            Session-window panels built from those results
-    course.ts             ANALYZE_COURSE (10 modules, all authored), allLessons, nextLessonAfter
-    content/module1-data-types.ts … module10-cause.ts   one file per module
+    course.ts             ANALYZE_COURSE (10 modules), allLessons, nextLessonAfter
+    measureCourse.ts      MEASURE_COURSE: MSA Type 1, Type 2, Type 3, and pass/fail agreement
+    tracks.ts             Copy and storage key for each academy. Academy.tsx renders whichever track it is given.
+    content/module1-data-types.ts … module10-cause.ts   Analyze, one file per module
+    content/msa1-strategy.ts … msa5-discrete.ts         Measure MSA. msa-shared.ts holds the datasets the prose quotes.
     components/Cards.tsx       card renderers + RichText (**bold**, "- " bullets) + hint→retry→reveal logic
     components/LessonPlayer.tsx  progress bar, sticky Continue footer, completion screen, scoring
-    components/Charts.tsx      SVG charts: histogram, scatter, box, bars, Pareto, run, I-chart, probability plot, effects
+    components/Charts.tsx      SVG charts, including the Type 1 repeat plot (reference, mean, ±10% of tolerance)
     components/VisualView.tsx  Visual dispatcher, plus fishbone and flow strip
-    components/Sims.tsx        slider sims: resolution, sampleSize, correlation, binWidth, runShift
+    components/Sims.tsx        slider sims, including type1Bias (Cg stays put, Cgk falls)
     rng.ts                 seeded PRNG (mulberry32), normals(), mean/sd/pearson/linearFit, shuffleSeeded
-    useAcademyProgress.ts  localStorage key 'belt-forge-academy-v1' {lessons:{[id]:LessonResult}, xp}
+    useAcademyProgress.ts  Analyze key 'belt-forge-academy-v1'. Measure key 'belt-forge-measure-academy-v1'. Do not rename either.
     Academy.tsx            course map + routes into LessonPlayer
     academy.css
 scripts/check-academy.ts    integrity + golden stats (`npx tsx scripts/check-academy.ts`)
@@ -153,8 +156,8 @@ Commits are authored as `Alex Pearce <midasara2000@gmail.com>` via `git -c user.
 
 ## 4. Current bugs / unfinished work
 
-- **No known functional bugs** in v3.0.0. The Analyze Academy has no `comingSoon` modules.
-- **Awaiting user feedback** on card length, text amount, difficulty and exercise mix across the full path. Adjust existing lessons from that feedback before opening a new phase academy.
+- **No known functional bugs** in v3.1.0. Analyze (10 modules) and the MSA Measure academy (5 modules, 19 lessons) are both open from the hub. Progress is stored separately.
+- The rest of Measure is still recap-only: DPMO / ppm / DPU / yield, and Cp/Cpk. Do not start those until the user asks.
 - Minor or tech debt:
   - The bundle is about 1 MB, which triggers Vite's chunk-size warning. It's harmless; code-splitting the Academy with `React.lazy` is optional.
   - Academy XP (`belt-forge-academy-v1`) is separate from the main hub XP/rank. Unify it only if the user wants that.
@@ -167,8 +170,10 @@ Commits are authored as `Alex Pearce <midasara2000@gmail.com>` via `git -c user.
 
 ## 5. Immediate next step
 
-**Do not author another phase until the user has played v3.0.0.** The live badge must read **v3.0.0**.
+The live badge should read **v3.1.0**. Hard-refresh https://midasara2000.github.io/belt-forge/ and open **Measure Academy**.
 
-When they want the next academy, build a **Measure academy** (MSA including Gage R&R binary / Type I / Type II / linearity, DPMO / ppm / DPU / yield, Cp/Cpk and stability). Reuse the card, chart and Minitab patterns. Keep answers computed in `stats.ts`. Bump `APP_VERSION`. Run `npx tsx scripts/check-academy.ts`, `npm run lint`, `npm run build`, and a 414 px Playwright pass.
+MSA Type 1, Type 2, Type 3, and pass/fail agreement are in that academy. The 9% variance share and the 30% study variation are taught as different numbers from the same 0.04 / 0.05 / 0.91 study, matching question `chs-054`. A %Study Variation of 32% is taught as marginal, matching `chs-050`.
 
-After that, the book’s highest-yield remaining clusters are Improve selection (must criteria, effort-benefit, N/3, Pugh) and Control charts. Define project-management topics can stay at recap depth.
+When the user asks for the next block, add DPMO / ppm / DPU / yield and then Cp/Cpk. Keep answers in `stats.ts`. Bump `APP_VERSION`. Run `npx tsx scripts/check-academy.ts`, `npm run lint`, `npm run build`, and a 414 px pass.
+
+Improve selection and Control-chart selection stay later. Define project-management topics can stay at recap depth.
