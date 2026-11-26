@@ -6,6 +6,7 @@ import { QuizSession, type QuizSnapshot } from './components/QuizSession';
 import { Results } from './components/Results';
 import { SkillPath } from './components/SkillPath';
 import { Academy } from './academy/Academy';
+import { ANALYZE_TRACK, MEASURE_TRACK } from './academy/tracks';
 import { VersionMark } from './components/VersionMark';
 import { APP_BUILD_LABEL } from './version';
 import { ACHIEVEMENTS } from './data/achievements';
@@ -39,7 +40,7 @@ type Screen =
   | { kind: 'guide' }
   | { kind: 'learn'; highlightIds?: string[] }
   | PathScreen
-  | { kind: 'academy' }
+  | { kind: 'academy'; track: 'analyze' | 'measure' }
   | {
       kind: 'lesson';
       lessonId: string;
@@ -240,10 +241,11 @@ export default function App() {
   }
 
   if (screen.kind === 'academy') {
+    const track = screen.track === 'measure' ? MEASURE_TRACK : ANALYZE_TRACK;
     return (
       <div className="app-shell">
         <VersionMark />
-        <Academy onExit={() => setScreen({ kind: 'hub' })} />
+        <Academy key={track.storageKey} track={track} onExit={() => setScreen({ kind: 'hub' })} />
       </div>
     );
   }
@@ -584,7 +586,14 @@ export default function App() {
             blurb="Interactive building blocks: label data, pick the tool, read Minitab output, drag sliders. Bite-sized cards with instant checks."
             action="Start learning"
             accent="#3d4a6b"
-            onClick={() => setScreen({ kind: 'academy' })}
+            onClick={() => setScreen({ kind: 'academy', track: 'analyze' })}
+          />
+          <ModeCard
+            title="Measure Academy"
+            blurb="MSA Type 1, 2 and 3. See why a continuous reading and a pass/fail call need different studies, then use the formulas."
+            action="Start MSA"
+            accent="#1f6f5b"
+            onClick={() => setScreen({ kind: 'academy', track: 'measure' })}
           />
           <ModeCard
             title="Skill Path"

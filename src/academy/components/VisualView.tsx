@@ -1,5 +1,5 @@
 import type { MinitabOutput, Visual } from '../types';
-import { BoxPlot, Bars, ControlChart, DotStrip, EffectsChart, Histogram, Pareto, ProbPlot, RunChart, Scatter, StackedBars } from './Charts';
+import { BoxPlot, Bars, ControlChart, DotStrip, EffectsChart, Histogram, Pareto, ProbPlot, RunChart, Scatter, StackedBars, Type1Chart } from './Charts';
 
 export function MinitabPanel({ output }: { output: MinitabOutput }) {
   return (
@@ -174,6 +174,21 @@ export function VisualView({ visual }: { visual: Visual }) {
       return <StackedBars {...visual} />;
     case 'dotstrip':
       return <DotStrip {...visual} />;
+    case 'type1':
+      return (
+        <div>
+          <Type1Chart
+            values={visual.values}
+            reference={visual.reference}
+            tolerance={visual.tolerance}
+            yLabel={visual.yLabel}
+          />
+          <p className="ac-chart-note">
+            Dots are repeats. Solid teal: reference. Dashed amber: mean. Shade: ±10% of the tolerance around the
+            reference.
+          </p>
+        </div>
+      );
     case 'runChart':
       return <RunChart {...visual} />;
     case 'pareto':

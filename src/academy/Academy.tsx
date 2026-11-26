@@ -1,26 +1,39 @@
 import { useState } from 'react';
-import { ANALYZE_COURSE, allLessons, nextLessonAfter } from './course';
 import { LessonPlayer } from './components/LessonPlayer';
 import { useAcademyProgress } from './useAcademyProgress';
 import type { AcademyLesson, AcademyModule } from './types';
 import './academy.css';
 
+export interface AcademyTrack {
+  course: AcademyModule[];
+  storageKey: string;
+  eyebrow: string;
+  title: string;
+  lede: string;
+}
+
 interface Props {
   onExit: () => void;
+  track: AcademyTrack;
 }
 
 type View = { kind: 'map' } | { kind: 'lesson'; module: AcademyModule; lesson: AcademyLesson };
 
-export function Academy({ onExit }: Props) {
-  const { progress, completeLesson } = useAcademyProgress();
+function lessonsOf(course: AcademyModule[]) {
+  return course.flatMap((module) => module.lessons.map((lesson) => ({ module, lesson })));
+}
+
+export function Academy({ onExit, track }: Props) {
+  const { progress, completeLesson } = useAcademyProgress(track.storageKey);
   const [view, setView] = useState<View>({ kind: 'map' });
 
-  const lessons = allLessons();
+  const lessons = lessonsOf(track.course);
   const doneCount = lessons.filter((x) => progress.lessons[x.lesson.id]?.completed).length;
   const recommended = lessons.find((x) => !progress.lessons[x.lesson.id]?.completed);
 
   if (view.kind === 'lesson') {
-    const next = nextLessonAfter(view.lesson.id);
+    const index = lessons.findIndex((x) => x.lesson.id === view.lesson.id);
+    const next = index >= 0 && index < lessons.length - 1 ? lessons[index + 1] : undefined;
     return (
       <LessonPlayer
         key={view.lesson.id}
@@ -40,12 +53,9 @@ export function Academy({ onExit }: Props) {
         ← Hub
       </button>
       <header className="ac-map__hero">
-        <p className="eyebrow">Analyze Academy · building blocks</p>
-        <h2 className="section-title">Analyze, one block at a time</h2>
-        <p className="lede">
-          The full Analyze path, one block at a time: see the data, choose a tool, test it, then confirm
-          the causes. Recommended order is top to bottom, and any lesson can be opened.
-        </p>
+        <p className="eyebrow">{track.eyebrow}</p>
+        <h2 className="section-title">{track.title}</h2>
+        <p className="lede">{track.lede}</p>
         <div className="ac-map__stats">
           <span>
             <strong>{doneCount}</strong>/{lessons.length} lessons
@@ -66,7 +76,7 @@ export function Academy({ onExit }: Props) {
       </header>
 
       <ol className="ac-modules">
-        {ANALYZE_COURSE.map((m) => {
+        {track.course.map((m) => {
           const modDone = m.lessons.filter((l) => progress.lessons[l.id]?.completed).length;
           return (
             <li key={m.id} className={`ac-module ${m.comingSoon ? 'is-soon' : ''}`}>

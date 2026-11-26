@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { normals, round } from '../rng';
+import { cg, cgk } from '../stats';
 import type { SimKind } from '../types';
 import { Histogram, RunChart, Scatter } from './Charts';
 
@@ -192,6 +193,41 @@ function RunShiftSim() {
   );
 }
 
+function Type1BiasSim() {
+  const tolerance = 0.6;
+  const s = 0.01;
+  const [steps, setSteps] = useState(0);
+  const bias = steps / 100;
+  const cgValue = cg(tolerance, s);
+  const cgkValue = cgk(tolerance, s, bias);
+  return (
+    <div className="ac-sim">
+      <label className="ac-sim__control">
+        <span>
+          Bias |mean − reference|: <strong>{bias.toFixed(2)} mm</strong>
+        </span>
+        <input
+          type="range"
+          min={0}
+          max={4}
+          step={1}
+          value={steps}
+          onChange={(e) => setSteps(Number(e.target.value))}
+        />
+      </label>
+      <div className="ac-sim__readout">
+        <span>
+          Cg: <strong>{cgValue.toFixed(2)}</strong>
+        </span>
+        <span>
+          Cgk: <strong>{cgkValue.toFixed(2)}</strong>
+        </span>
+        <span>T = 0.60 mm, s = 0.010 mm, held fixed.</span>
+      </div>
+    </div>
+  );
+}
+
 export function Sim({ kind }: { kind: SimKind }) {
   switch (kind) {
     case 'resolution':
@@ -204,5 +240,7 @@ export function Sim({ kind }: { kind: SimKind }) {
       return <BinWidthSim />;
     case 'runShift':
       return <RunShiftSim />;
+    case 'type1Bias':
+      return <Type1BiasSim />;
   }
 }

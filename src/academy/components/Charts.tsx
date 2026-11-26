@@ -541,6 +541,66 @@ export function EffectsChart({ effects }: { effects: { label: string; value: num
   );
 }
 
+/** Type 1 repeats against a reference, with the ±10% of tolerance band drawn around it. */
+export function Type1Chart({
+  values,
+  reference,
+  tolerance,
+  yLabel,
+}: {
+  values: number[];
+  reference: number;
+  tolerance: number;
+  yLabel: string;
+}) {
+  const m = mean(values);
+  const half = 0.1 * tolerance;
+  const loData = Math.min(...values, reference - half, m);
+  const hiData = Math.max(...values, reference + half, m);
+  const pad = (hiData - loData) * 0.22 || 0.02;
+  const lo = loData - pad;
+  const hi = hiData + pad;
+  const sy = (v: number) => M.t + ((hi - v) / (hi - lo)) * IH;
+  const sx = (i: number) => M.l + ((i + 0.5) / values.length) * IW;
+  const yRef = sy(reference);
+  const yMean = sy(m);
+  const bandTop = sy(reference + half);
+  const bandBot = sy(reference - half);
+  const meanAbove = m >= reference;
+  return (
+    <Frame xLabel="Repeat" yLabel={yLabel} label={`Type 1 repeats of ${yLabel}`}>
+      <YAxis ticks={niceTicks(lo, hi, 5)} sy={sy} />
+      <rect
+        x={M.l}
+        y={Math.min(bandTop, bandBot)}
+        width={IW}
+        height={Math.max(1, Math.abs(bandBot - bandTop))}
+        fill={TEAL}
+        fillOpacity={0.12}
+      />
+      <line x1={M.l} x2={M.l + IW} y1={yRef} y2={yRef} stroke={TEAL} strokeWidth={1.7} />
+      <line
+        x1={M.l}
+        x2={M.l + IW}
+        y1={yMean}
+        y2={yMean}
+        stroke={AMBER}
+        strokeWidth={1.7}
+        strokeDasharray="5 3"
+      />
+      {values.map((v, i) => (
+        <circle key={i} cx={sx(i)} cy={sy(v)} r={3.5} fill={INK} fillOpacity={0.82} />
+      ))}
+      <text x={M.l + IW - 4} y={yRef + (meanAbove ? 12 : -5)} textAnchor="end" fontSize="10" fill={TEAL}>
+        reference {reference.toFixed(2)}
+      </text>
+      <text x={M.l + 4} y={yMean + (meanAbove ? -5 : 12)} textAnchor="start" fontSize="10" fill={AMBER}>
+        mean {m.toFixed(3)}
+      </text>
+    </Frame>
+  );
+}
+
 export function DotStrip({ values, xLabel }: { values: number[]; xLabel: string }) {
   const min = Math.min(...values);
   const max = Math.max(...values);
